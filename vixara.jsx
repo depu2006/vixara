@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
   ShieldCheck, Menu, X, ArrowRight, ChevronLeft, ChevronRight,
-  Upload, RefreshCw, Shirt, Sparkles, Trash2
+  Upload, RefreshCw, Shirt, Sparkles, Trash2, Heart
 } from "lucide-react";
 
 /* Shared editorial shot used as the "Styled" gallery view — a stand-in
@@ -70,10 +70,17 @@ function Reveal({ as: Tag = "div", className = "", children, style }) {
   );
 }
 
-function ProductCard({ product, onOpen }) {
+function ProductCard({ product, onOpen, isFavorite, onToggleFavorite }) {
   return (
     <div className="piece" onClick={() => onOpen(product)} role="button" tabIndex={0}
       onKeyDown={(e) => { if (e.key === "Enter") onOpen(product); }}>
+      <button
+        className={`favorite-pill ${isFavorite ? "active" : ""}`}
+        onClick={(e) => { e.stopPropagation(); onToggleFavorite(product); }}
+        aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+      >
+        <Heart size={14} strokeWidth={1.8} fill={isFavorite ? "currentColor" : "none"} />
+      </button>
       <img src={product.img} alt={`${product.brand} ${product.name}`} />
       <div className="seal">
         <ShieldCheck size={16} strokeWidth={1.5} />
@@ -180,7 +187,7 @@ function TryOnStudio({ product }) {
   );
 }
 
-function ProductModal({ product, onClose }) {
+function ProductModal({ product, onClose, isFavorite, onToggleFavorite }) {
   const [tab, setTab] = useState("gallery");
   const [viewIndex, setViewIndex] = useState(0);
 
@@ -245,10 +252,48 @@ function ProductModal({ product, onClose }) {
             Inspected under Vixara's three-point standard: material verification, label and hardware cross-check,
             and a documented chain of custody. Ships with a numbered authentication card.
           </p>
+          <button className={`btn-ghost small ${isFavorite ? "active-favorite" : ""}`} style={{ width: "100%", justifyContent: "center", marginBottom: 12 }} onClick={() => onToggleFavorite(product)}>
+            <Heart size={14} strokeWidth={1.8} fill={isFavorite ? "currentColor" : "none"} /> {isFavorite ? "Saved to Favorites" : "Add to Favorites"}
+          </button>
           <button className="btn-primary" style={{ width: "100%", justifyContent: "center" }}>
             Reserve This Piece <ArrowRight size={15} />
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function FavoritesDrawer({ open, onClose, favorites, onToggleFavorite }) {
+  return (
+    <div className={`favorites-backdrop ${open ? "open" : ""}`} onClick={onClose}>
+      <div className={`favorites-drawer ${open ? "open" : ""}`} onClick={(e) => e.stopPropagation()}>
+        <div className="favorites-head">
+          <h3 className="display">Favorites</h3>
+          <button className="modal-close static" onClick={onClose} aria-label="Close favorites"><X size={18} /></button>
+        </div>
+        {favorites.length === 0 ? (
+          <div className="cart-empty">
+            <Heart size={28} strokeWidth={1.2} />
+            <p>Save pieces you love and they’ll stay here for later.</p>
+          </div>
+        ) : (
+          <div className="favorites-list">
+            {favorites.map((product) => (
+              <div className="favorite-item" key={product.id}>
+                <img src={product.img} alt={product.name} />
+                <div>
+                  <div className="piece-brand">{product.brand}</div>
+                  <div className="favorite-item-name">{product.name}</div>
+                  <div className="piece-price">${product.price.toLocaleString()} · Size {product.size}</div>
+                </div>
+                <button className="cart-remove" onClick={() => onToggleFavorite(product)} aria-label="Remove from favorites">
+                  <Heart size={15} strokeWidth={1.8} fill="currentColor" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -261,6 +306,8 @@ export default function VixaraSite() {
   const [email, setEmail] = useState("");
   const [requested, setRequested] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [favorites, setFavorites] = useState([]);
+  const [favoritesOpen, setFavoritesOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -269,6 +316,15 @@ export default function VixaraSite() {
   }, []);
 
   const filtered = category === "All" ? PRODUCTS : PRODUCTS.filter(p => p.category === category);
+
+  const toggleFavorite = useCallback((product) => {
+    setFavorites((prev) => {
+      const exists = prev.some((item) => item.id === product.id);
+      return exists ? prev.filter((item) => item.id !== product.id) : [...prev, product];
+    });
+  }, []);
+
+  const isFavorite = useCallback((product) => favorites.some((item) => item.id === product.id), [favorites]);
 
   const submit = useCallback((e) => {
     e.preventDefault();
@@ -504,6 +560,24 @@ export default function VixaraSite() {
 
         .reveal{opacity:0;transform:translateY(22px);transition:opacity .8s ease, transform .8s ease;}
         .reveal.in{opacity:1;transform:translateY(0);}
+
+        .header-actions{display:flex;align-items:center;gap:12px;}
+        .icon-btn{position:relative;width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:var(--bone);border:1px solid var(--hairline-strong);background:transparent;}
+        .icon-btn:hover{color:var(--brass-bright);border-color:var(--brass-bright);}
+        .icon-badge{position:absolute;top:2px;right:2px;background:var(--brass);color:var(--ink);font-size:10px;font-weight:700;min-width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0 3px;}
+        .favorite-pill{position:absolute;top:16px;left:16px;z-index:2;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid var(--hairline-strong);background:rgba(11,11,12,0.6);backdrop-filter:blur(4px);color:var(--bone);}
+        .favorite-pill.active{background:var(--brass);color:var(--ink);border-color:var(--brass);} 
+        .active-favorite{border-color:var(--brass-bright);color:var(--brass-bright);} 
+        .favorites-backdrop{position:fixed;inset:0;z-index:400;background:rgba(11,11,12,0);pointer-events:none;transition:background .35s ease;}
+        .favorites-backdrop.open{background:rgba(11,11,12,0.75);backdrop-filter:blur(4px);pointer-events:auto;}
+        .favorites-drawer{position:fixed;top:0;right:0;height:100%;width:min(420px, 100%);background:var(--ink-2);border-left:1px solid var(--hairline-strong);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .4s cubic-bezier(.2,.8,.2,1);padding:28px 26px;}
+        .favorites-drawer.open{transform:translateX(0);} 
+        .favorites-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;} 
+        .favorites-head h3{font-size:22px;font-weight:400;margin:0;} 
+        .favorites-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:16px;padding-right:4px;} 
+        .favorite-item{display:grid;grid-template-columns:60px 1fr auto;gap:12px;padding-bottom:16px;border-bottom:1px solid var(--hairline);} 
+        .favorite-item img{width:60px;height:74px;object-fit:cover;filter:grayscale(15%) brightness(0.88);} 
+        .favorite-item-name{font-family:'Fraunces',serif;font-size:16px;margin:3px 0 6px;} 
       `}</style>
 
       <header className={scrolled ? "scrolled" : ""}>
@@ -516,9 +590,15 @@ export default function VixaraSite() {
           </ul></nav>
           <a href="#membership" className="nav-cta" onClick={(e) => scrollToSection('#membership', e)}>Request Access</a>
         </div>
-        <button className="menu-btn" aria-label="Toggle menu" onClick={() => setMenuOpen(m => !m)}>
-          {menuOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        <div className="header-actions">
+          <button className="icon-btn" aria-label="Open favorites" onClick={() => setFavoritesOpen(true)}>
+            <Heart size={20} strokeWidth={1.6} fill={favorites.length ? "currentColor" : "none"} />
+            {favorites.length > 0 && <span className="icon-badge">{favorites.length}</span>}
+          </button>
+          <button className="menu-btn" aria-label="Toggle menu" onClick={() => setMenuOpen(m => !m)}>
+            {menuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </header>
 
       {menuOpen && (
@@ -576,11 +656,11 @@ export default function VixaraSite() {
           </Reveal>
         </div>
         <div className="grid">
-          {filtered.map(p => <ProductCard key={p.id} product={p} onOpen={setSelectedProduct} />)}
+          {filtered.map(p => <ProductCard key={p.id} product={p} onOpen={setSelectedProduct} isFavorite={isFavorite(p)} onToggleFavorite={toggleFavorite} />)}
         </div>
       </section>
 
-      <ProductModal product={selectedProduct} onClose={() => setSelectedProduct(null)} />
+      <ProductModal product={selectedProduct} onClose={() => setSelectedProduct(null)} isFavorite={selectedProduct ? isFavorite(selectedProduct) : false} onToggleFavorite={toggleFavorite} />
       <section className="section" id="manifesto" style={{paddingTop:0}}>
         <div className="wrap">
           <Reveal className="manifesto">
@@ -641,6 +721,8 @@ export default function VixaraSite() {
           {requested && <p className="membership-note">You're on the list — we'll be in touch before the next drop.</p>}
         </Reveal>
       </section>
+
+      <FavoritesDrawer open={favoritesOpen} onClose={() => setFavoritesOpen(false)} favorites={favorites} onToggleFavorite={toggleFavorite} />
 
       <footer>
         <div className="wrap">
