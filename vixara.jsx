@@ -363,6 +363,7 @@ export default function VixaraSite() {
         .display{font-family:'Fraunces',serif;}
         .mono{font-family:'IBM Plex Mono',monospace;letter-spacing:0.06em;}
         .wrap{max-width:1280px;margin:0 auto;padding:0 48px;}
+        @media(max-width:1024px){.wrap{padding:0 32px;}}
         @media(max-width:720px){.wrap{padding:0 22px;}}
         button, .btn{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit;}
         a:focus-visible, button:focus-visible{outline:2px solid var(--brass-bright);outline-offset:3px;}
@@ -374,6 +375,7 @@ export default function VixaraSite() {
           backdrop-filter:blur(10px);
         }
         header.scrolled{padding:16px 48px;border-bottom:1px solid var(--hairline);background:rgba(11,11,12,0.9);}
+        @media(max-width:1024px){header,header.scrolled{padding:20px 32px;}}
         @media(max-width:720px){header,header.scrolled{padding:18px 22px;}}
         .logo{font-family:'Fraunces',serif;font-weight:500;font-size:22px;letter-spacing:0.08em;}
         .logo em{font-style:italic;color:var(--brass-bright);}
@@ -387,7 +389,8 @@ export default function VixaraSite() {
         @media(max-width:860px){.nav-links{display:none;}.menu-btn{display:flex;}}
 
         .hero{position:relative;min-height:92vh;display:flex;flex-direction:column;justify-content:flex-end;padding:100px 48px 0;overflow:hidden;}
-        @media(max-width:720px){.hero{padding:70px 22px 0;}}
+        @media(max-width:1024px){.hero{padding:90px 32px 0;min-height:84vh;}}
+        @media(max-width:720px){.hero{padding:70px 22px 0;min-height:80vh;}}
         .hero-bg{
           position:absolute;inset:0;
           background:
@@ -402,7 +405,9 @@ export default function VixaraSite() {
         .hero h1 .accent{font-style:italic;font-weight:300;color:var(--brass-bright);}
         .hero-sub{display:flex;justify-content:space-between;align-items:flex-end;margin-top:36px;padding-top:32px;border-top:1px solid var(--hairline);gap:36px;flex-wrap:wrap;}
         .hero-sub p{max-width:420px;font-size:16px;line-height:1.7;color:var(--bone-dim);font-weight:300;}
-        .hero-actions{display:flex;gap:16px;flex-shrink:0;}
+        .hero-actions{display:flex;gap:16px;flex-shrink:0;flex-wrap:wrap;}
+        @media(max-width:900px){.hero-sub{flex-direction:column;align-items:flex-start;gap:24px;}}
+        @media(max-width:720px){.hero-actions{width:100%;flex-direction:column;align-items:stretch;}}
         .btn-primary{background:var(--brass);color:var(--ink);padding:16px 34px;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;transition:transform .3s ease, background .3s ease;display:inline-flex;align-items:center;gap:8px;}
         .btn-primary:hover{background:var(--brass-bright);transform:translateY(-2px);}
         .btn-ghost{border:1px solid var(--hairline-strong);padding:16px 34px;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;transition:border-color .3s ease;}
@@ -420,6 +425,7 @@ export default function VixaraSite() {
 
         .section{padding:110px 0;} @media(max-width:720px){.section{padding:70px 0;}}
         .section-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:48px;gap:30px;flex-wrap:wrap;padding-bottom:26px;border-bottom:1px solid var(--hairline);}
+        @media(max-width:720px){.section-head{flex-direction:column;align-items:flex-start;gap:18px;margin-bottom:32px;}}
         .section-head .tag{font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:var(--brass-bright);margin-bottom:14px;display:block;}
         .section-head h2{font-family:'Fraunces',serif;font-weight:400;font-size:clamp(28px,4vw,46px);max-width:600px;margin:0;}
         .section-head p{max-width:320px;color:var(--bone-dim);font-size:15px;line-height:1.7;font-weight:300;}
@@ -429,8 +435,9 @@ export default function VixaraSite() {
         .filter-btn:hover{border-color:var(--bone);}
         .filter-btn.active{background:var(--brass);border-color:var(--brass);color:var(--ink);}
 
-        .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--hairline);}
-        @media(max-width:900px){.grid{grid-template-columns:1fr;}}
+        .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;background:var(--hairline);}
+        @media(max-width:1024px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+        @media(max-width:720px){.grid{grid-template-columns:1fr;}}
         .piece{position:relative;background:var(--card);aspect-ratio:3/4;overflow:hidden;cursor:pointer;}
         .quick-view-tag{
           position:absolute;left:18px;top:18px;background:var(--brass);color:var(--ink);
@@ -470,6 +477,8 @@ export default function VixaraSite() {
         .membership h2 em{font-style:italic;color:var(--brass-bright);}
         .membership-form{display:flex;justify-content:center;max-width:440px;margin:0 auto;border:1px solid var(--hairline-strong);}
         .membership-form input{flex:1;background:transparent;border:none;padding:18px 20px;color:var(--bone);font-family:'Manrope',sans-serif;font-size:14px;}
+        @media(max-width:720px){.membership-form{flex-direction:column;border:none;gap:12px;max-width:100%;}}
+        @media(max-width:720px){.membership-form input,.membership-form button{width:100%;border:1px solid var(--hairline-strong);}}
         .membership-form input::placeholder{color:var(--bone-dim);}
         .membership-form button{background:var(--brass);color:var(--ink);padding:18px 26px;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;transition:background .3s ease;white-space:nowrap;}
         .membership-form button:hover{background:var(--brass-bright);}
@@ -477,7 +486,8 @@ export default function VixaraSite() {
 
         footer{padding:60px 0 36px;}
         .footer-top{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:36px;padding-bottom:48px;border-bottom:1px solid var(--hairline);}
-        @media(max-width:760px){.footer-top{grid-template-columns:1fr 1fr;}}
+        @media(max-width:900px){.footer-top{grid-template-columns:1fr 1fr;}}
+        @media(max-width:600px){.footer-top{grid-template-columns:1fr;}}
         .footer-brand p{font-size:14px;color:var(--bone-dim);font-weight:300;max-width:260px;line-height:1.7;margin-top:14px;}
         .footer-col h4{font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:var(--brass-bright);margin-bottom:18px;}
         .footer-col ul{list-style:none;margin:0;padding:0;}
@@ -496,7 +506,8 @@ export default function VixaraSite() {
           width:100%;max-width:960px;max-height:90vh;overflow:auto;
           display:grid;grid-template-columns:1.2fr 1fr;
         }
-        @media(max-width:800px){.modal{grid-template-columns:1fr;}}
+        @media(max-width:900px){.modal{grid-template-columns:1fr;}}
+        @media(max-width:720px){.modal-backdrop{padding:12px;} .modal{max-height:95vh;} .modal-media{padding:18px;} .modal-info{padding:20px 18px 24px;}}
         .modal-close{
           position:absolute;top:16px;right:16px;z-index:5;width:38px;height:38px;border-radius:50%;
           background:rgba(11,11,12,0.6);border:1px solid var(--hairline-strong);
@@ -515,8 +526,9 @@ export default function VixaraSite() {
         }
         .gallery-nav:hover{background:rgba(11,11,12,0.85);}
         .gallery-nav.prev{left:14px;} .gallery-nav.next{right:14px;}
-        .thumbs{display:flex;gap:10px;}
-        .thumb{flex:1;border:1px solid var(--hairline);background:none;padding:0;overflow:hidden;display:flex;flex-direction:column;}
+        .thumbs{display:flex;gap:10px;flex-wrap:wrap;}
+        .thumb{flex:1;min-width:0;border:1px solid var(--hairline);background:none;padding:0;overflow:hidden;display:flex;flex-direction:column;}
+        @media(max-width:600px){.thumb{flex:0 0 calc(50% - 6px);}}
         .thumb.active{border-color:var(--brass-bright);}
         .thumb img{width:100%;aspect-ratio:1/1;object-fit:cover;filter:grayscale(20%) brightness(0.85);}
         .thumb img.zoomed{transform:scale(1.7);}
@@ -553,6 +565,7 @@ export default function VixaraSite() {
         .tryon-controls label{display:flex;align-items:center;gap:12px;font-size:12px;letter-spacing:0.05em;text-transform:uppercase;color:var(--bone-dim);}
         .tryon-controls input[type="range"]{flex:1;accent-color:var(--brass);}
         .tryon-actions{display:flex;gap:8px;flex-wrap:wrap;}
+        @media(max-width:720px){.tryon-actions{flex-direction:column;}}
         .btn-ghost.small{padding:9px 14px;font-size:11px;display:inline-flex;align-items:center;gap:6px;}
         .as-label{cursor:pointer;}
         .tryon-note{display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.6;color:var(--bone-dim);}
@@ -571,6 +584,7 @@ export default function VixaraSite() {
         .favorites-backdrop{position:fixed;inset:0;z-index:400;background:rgba(11,11,12,0);pointer-events:none;transition:background .35s ease;}
         .favorites-backdrop.open{background:rgba(11,11,12,0.75);backdrop-filter:blur(4px);pointer-events:auto;}
         .favorites-drawer{position:fixed;top:0;right:0;height:100%;width:min(420px, 100%);background:var(--ink-2);border-left:1px solid var(--hairline-strong);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .4s cubic-bezier(.2,.8,.2,1);padding:28px 26px;}
+        @media(max-width:720px){.favorites-drawer{padding:22px 18px;}}
         .favorites-drawer.open{transform:translateX(0);} 
         .favorites-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;} 
         .favorites-head h3{font-size:22px;font-weight:400;margin:0;} 
