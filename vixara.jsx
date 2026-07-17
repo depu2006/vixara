@@ -376,7 +376,11 @@ export default function VixaraSite() {
         }
         header.scrolled{padding:16px 48px;border-bottom:1px solid var(--hairline);background:rgba(11,11,12,0.9);}
         @media(max-width:1024px){header,header.scrolled{padding:20px 32px;}}
-        @media(max-width:720px){header,header.scrolled{padding:18px 22px;}}
+        @media(max-width:860px){
+          header{position:fixed;left:0;right:0;top:0;z-index:220;box-shadow:0 8px 24px rgba(0,0,0,0.2);} 
+          header.scrolled{padding:16px 22px;}
+        }
+        @media(max-width:720px){header,header.scrolled{padding:16px 22px;}}
         .logo{font-family:'Fraunces',serif;font-weight:500;font-size:22px;letter-spacing:0.08em;}
         .logo em{font-style:italic;color:var(--brass-bright);}
         nav ul{display:flex;gap:38px;list-style:none;margin:0;padding:0;}
@@ -390,7 +394,8 @@ export default function VixaraSite() {
 
         .hero{position:relative;min-height:92vh;display:flex;flex-direction:column;justify-content:flex-end;padding:100px 48px 0;overflow:hidden;}
         @media(max-width:1024px){.hero{padding:90px 32px 0;min-height:84vh;}}
-        @media(max-width:720px){.hero{padding:70px 22px 0;min-height:80vh;}}
+        @media(max-width:860px){.hero{padding:120px 22px 0;min-height:82vh;}}
+        @media(max-width:720px){.hero{padding:110px 22px 0;min-height:80vh;}}
         .hero-bg{
           position:absolute;inset:0;
           background:
@@ -439,6 +444,17 @@ export default function VixaraSite() {
         @media(max-width:1024px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
         @media(max-width:720px){.grid{grid-template-columns:1fr;}}
         .piece{position:relative;background:var(--card);aspect-ratio:3/4;overflow:hidden;cursor:pointer;}
+        @media(max-width:720px){
+          .grid{gap:1px;}
+          .piece{aspect-ratio:5/6;}
+          .piece-info{padding:14px 14px 16px;}
+          .piece-name{font-size:16px;margin-bottom:6px;}
+          .piece-price{font-size:12px;}
+          .seal{width:48px;height:48px;top:10px;right:10px;}
+          .seal-text{font-size:6px;}
+          .quick-view-tag{left:10px;top:10px;padding:6px 10px;font-size:9px;}
+          .favorite-pill{top:10px;left:10px;width:30px;height:30px;}
+        }
         .quick-view-tag{
           position:absolute;left:18px;top:18px;background:var(--brass);color:var(--ink);
           font-size:11px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;
