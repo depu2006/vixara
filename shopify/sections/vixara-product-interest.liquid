@@ -1,0 +1,723 @@
+{% comment %}
+  Vixara Product Interest & Lead Capture Custom Section
+  File: sections/vixara-product-interest.liquid
+  Description: Custom product section with 'Interested' chat flow & 'Not Interested' feedback collection, complete with dynamic discount generator and Shopify schema options.
+{% endcomment %}
+
+<div id="vixara-interest-section-{{ section.id }}" class="vx-shopify-root">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,400&family=Manrope:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+    #vixara-interest-section-{{ section.id }} {
+      --vx-ink: {{ section.settings.bg_color | default: "#0b0b0c" }};
+      --vx-card: #17171a;
+      --vx-bone: #f0ede6;
+      --vx-bone-dim: #c9c5ba;
+      --vx-brass: {{ section.settings.accent_color | default: "#b6905a" }};
+      --vx-brass-bright: #d8b077;
+      --vx-hairline: rgba(240, 237, 230, 0.12);
+      --vx-hairline-strong: rgba(240, 237, 230, 0.24);
+
+      background-color: var(--vx-ink);
+      color: var(--vx-bone);
+      font-family: 'Manrope', sans-serif;
+      padding: 60px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #vixara-interest-section-{{ section.id }} * {
+      box-sizing: border-box;
+    }
+
+    .vx-container {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .vx-product-card-hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      background: var(--vx-card);
+      border: 1px solid var(--vx-hairline-strong);
+      padding: 36px;
+      position: relative;
+    }
+
+    @media (max-width: 860px) {
+      .vx-product-card-hero {
+        grid-template-columns: 1fr;
+        padding: 24px;
+        gap: 28px;
+      }
+    }
+
+    .vx-gallery-main {
+      position: relative;
+      aspect-ratio: 4/5;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .vx-gallery-main img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(15%) brightness(0.9);
+      transition: transform 0.6s ease;
+    }
+
+    .vx-gallery-main:hover img {
+      transform: scale(1.04);
+    }
+
+    .vx-seal-badge {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      padding: 6px 14px;
+      background: rgba(11, 11, 12, 0.75);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--vx-brass);
+      color: var(--vx-brass-bright);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .vx-product-details {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .vx-brand-tag {
+      font-size: 12px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--vx-brass-bright);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .vx-product-title {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 400;
+      margin: 0 0 16px 0;
+      line-height: 1.15;
+    }
+
+    .vx-price-tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 20px;
+      color: var(--vx-bone);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .vx-price-tag .vx-original-price {
+      text-decoration: line-through;
+      color: var(--vx-bone-dim);
+      font-size: 16px;
+    }
+
+    .vx-description {
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: var(--vx-bone-dim);
+      font-weight: 300;
+      margin-bottom: 32px;
+    }
+
+    .vx-action-group {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .vx-btn {
+      padding: 16px 28px;
+      font-family: 'Manrope', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .vx-btn-interested {
+      background: var(--vx-brass);
+      color: var(--vx-ink);
+      flex: 1.2;
+      min-width: 180px;
+    }
+
+    .vx-btn-interested:hover {
+      background: var(--vx-brass-bright);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(182, 144, 90, 0.25);
+    }
+
+    .vx-btn-not-interested {
+      background: transparent;
+      border: 1px solid var(--vx-hairline-strong);
+      color: var(--vx-bone-dim);
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .vx-btn-not-interested:hover {
+      border-color: var(--vx-bone);
+      color: var(--vx-bone);
+    }
+
+    /* Modal / Drawer Base Styling */
+    .vx-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(11, 11, 12, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.35s ease;
+    }
+
+    .vx-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .vx-modal-card {
+      background: #141416;
+      border: 1px solid var(--vx-hairline-strong);
+      width: 100%;
+      max-width: 540px;
+      padding: 32px;
+      position: relative;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      transform: translateY(20px);
+      transition: transform 0.35s ease;
+    }
+
+    .vx-overlay.active .vx-modal-card {
+      transform: translateY(0);
+    }
+
+    .vx-modal-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      background: transparent;
+      border: 1px solid var(--vx-hairline-strong);
+      color: var(--vx-bone-dim);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .vx-modal-close:hover {
+      border-color: var(--vx-bone);
+      color: var(--vx-bone);
+    }
+
+    /* Concierge Chat Form */
+    .vx-chat-header {
+      border-bottom: 1px solid var(--vx-hairline);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+
+    .vx-chat-header h3 {
+      font-family: 'Fraunces', serif;
+      font-size: 24px;
+      margin: 0 0 6px 0;
+    }
+
+    .vx-chat-header p {
+      font-size: 13px;
+      color: var(--vx-brass-bright);
+      margin: 0;
+    }
+
+    .vx-form-group {
+      margin-bottom: 20px;
+    }
+
+    .vx-form-group label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--vx-bone-dim);
+      margin-bottom: 8px;
+    }
+
+    .vx-size-options {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .vx-size-btn {
+      padding: 10px 16px;
+      border: 1px solid var(--vx-hairline-strong);
+      background: transparent;
+      color: var(--vx-bone);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .vx-size-btn.selected {
+      background: var(--vx-brass);
+      border-color: var(--vx-brass);
+      color: var(--vx-ink);
+      font-weight: 600;
+    }
+
+    .vx-input-field {
+      width: 100%;
+      background: #0b0b0c;
+      border: 1px solid var(--vx-hairline-strong);
+      padding: 14px 16px;
+      color: var(--vx-bone);
+      font-family: inherit;
+      font-size: 14px;
+    }
+
+    .vx-input-field:focus {
+      outline: none;
+      border-color: var(--vx-brass-bright);
+    }
+
+    .vx-pref-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .vx-pref-btn {
+      padding: 10px 8px;
+      border: 1px solid var(--vx-hairline-strong);
+      background: transparent;
+      color: var(--vx-bone-dim);
+      font-size: 12px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .vx-pref-btn.selected {
+      border-color: var(--vx-brass-bright);
+      color: var(--vx-brass-bright);
+      background: rgba(182, 144, 90, 0.1);
+    }
+
+    /* Discount Reward Box */
+    .vx-discount-box {
+      background: linear-gradient(135deg, rgba(182, 144, 90, 0.15) 0%, rgba(20, 20, 22, 0.9) 100%);
+      border: 1px dashed var(--vx-brass);
+      padding: 24px;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .vx-discount-code-badge {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 22px;
+      letter-spacing: 0.15em;
+      color: var(--vx-brass-bright);
+      background: rgba(11, 11, 12, 0.8);
+      padding: 12px;
+      margin: 14px 0;
+      border: 1px solid var(--vx-brass);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .vx-copy-btn {
+      background: var(--vx-brass);
+      color: var(--vx-ink);
+      border: none;
+      padding: 6px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    /* Not Interested Feedback Modal */
+    .vx-chip-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .vx-chip {
+      padding: 8px 14px;
+      border: 1px solid var(--vx-hairline-strong);
+      background: transparent;
+      color: var(--vx-bone-dim);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .vx-chip.selected {
+      border-color: var(--vx-brass);
+      color: var(--vx-brass-bright);
+      background: rgba(182, 144, 90, 0.12);
+    }
+  </style>
+
+  <div class="vx-container">
+    <div class="vx-product-card-hero">
+      <div class="vx-gallery-main">
+        <img src="{{ section.settings.product_image | img_url: '900x' | default: 'https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?auto=format&fit=crop&w=900&q=70' }}" alt="{{ section.settings.product_title }}">
+        <div class="vx-seal-badge">AUTHENTICATED • {{ section.settings.sku_code | default: 'VX-0417' }}</div>
+      </div>
+
+      <div class="vx-product-details">
+        <span class="vx-brand-tag">{{ section.settings.brand_name | default: 'Loro Piana' }}</span>
+        <h2 class="vx-product-title">{{ section.settings.product_title | default: 'Cashmere Overcoat' }}</h2>
+        
+        <div class="vx-price-tag">
+          <span>${{ section.settings.product_price | default: '3,240' }}</span>
+          {% if section.settings.compare_at_price != blank %}
+            <span class="vx-original-price">${{ section.settings.compare_at_price }}</span>
+          {% endif %}
+        </div>
+
+        <p class="vx-description">
+          {{ section.settings.product_description | default: "Inspected under Vixara's standard: material verification, label and hardware cross-check, and documented provenance." }}
+        </p>
+
+        <div class="vx-action-group">
+          <button type="button" class="vx-btn vx-btn-interested" id="vx-open-interested-{{ section.id }}">
+            Interested • VIP Perks
+          </button>
+          <button type="button" class="vx-btn vx-btn-not-interested" id="vx-open-feedback-{{ section.id }}">
+            Not Interested
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interested Chat Modal -->
+  <div class="vx-overlay" id="vx-modal-interested-{{ section.id }}">
+    <div class="vx-modal-card">
+      <button class="vx-modal-close" id="vx-close-interested-{{ section.id }}">&times;</button>
+      
+      <div id="vx-chat-step-form-{{ section.id }}">
+        <div class="vx-chat-header">
+          <h3>Vixara Concierge Chat</h3>
+          <p>Reserve size & receive dynamic 15% VIP discount code</p>
+        </div>
+
+        <form id="vx-interested-form-{{ section.id }}">
+          <div class="vx-form-group">
+            <label>Select Preferred Size</label>
+            <div class="vx-size-options">
+              <button type="button" class="vx-size-btn" data-size="S">S</button>
+              <button type="button" class="vx-size-btn selected" data-size="M">M</button>
+              <button type="button" class="vx-size-btn" data-size="L">L</button>
+              <button type="button" class="vx-size-btn" data-size="XL">XL</button>
+              <button type="button" class="vx-size-btn" data-size="Custom">Custom Fit</button>
+            </div>
+            <input type="hidden" id="vx-selected-size-{{ section.id }}" value="M">
+          </div>
+
+          <div class="vx-form-group">
+            <label>Communication Preference</label>
+            <div class="vx-pref-options">
+              <button type="button" class="vx-pref-btn selected" data-pref="Email">Email</button>
+              <button type="button" class="vx-pref-btn" data-pref="SMS">SMS Text</button>
+              <button type="button" class="vx-pref-btn" data-pref="WhatsApp">WhatsApp</button>
+            </div>
+            <input type="hidden" id="vx-selected-pref-{{ section.id }}" value="Email">
+          </div>
+
+          <div class="vx-form-group">
+            <label>Your Email / Contact Information</label>
+            <input type="email" class="vx-input-field" id="vx-client-email-{{ section.id }}" placeholder="client@domain.com" required>
+          </div>
+
+          <button type="submit" class="vx-btn vx-btn-interested" style="width: 100%;">
+            Unlock Exclusive VIP Discount & Reserve
+          </button>
+        </form>
+      </div>
+
+      <div id="vx-chat-step-success-{{ section.id }}" style="display: none;">
+        <div class="vx-chat-header">
+          <h3>Reserved & Authenticated ✓</h3>
+          <p>Your size preference has been locked in.</p>
+        </div>
+        <div class="vx-discount-box">
+          <span style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--vx-bone-dim);">
+            Your Exclusive Discount Code (15% OFF)
+          </span>
+          <div class="vx-discount-code-badge">
+            <span id="vx-code-text-{{ section.id }}">VIXARA-VIP-15</span>
+            <button type="button" class="vx-copy-btn" id="vx-copy-code-btn-{{ section.id }}">Copy</button>
+          </div>
+          <p style="font-size: 13px; color: var(--vx-bone-dim); margin-bottom: 16px;">
+            Applied automatically at checkout for this item.
+          </p>
+          <button type="button" class="vx-btn vx-btn-interested" style="width: 100%;" id="vx-apply-cart-btn-{{ section.id }}">
+            Proceed with Reserved Discount
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Not Interested Feedback Modal -->
+  <div class="vx-overlay" id="vx-modal-feedback-{{ section.id }}">
+    <div class="vx-modal-card">
+      <button class="vx-modal-close" id="vx-close-feedback-{{ section.id }}">&times;</button>
+      <div class="vx-chat-header">
+        <h3>Share Your Feedback</h3>
+        <p>Help us curate pieces tailored to your exact taste.</p>
+      </div>
+
+      <form id="vx-feedback-form-{{ section.id }}">
+        <div class="vx-form-group">
+          <label>Why are you not interested in this piece?</label>
+          <div class="vx-chip-group">
+            <button type="button" class="vx-chip selected" data-reason="Price point too high">Price too high</button>
+            <button type="button" class="vx-chip" data-reason="Wrong sizing available">Size unavailable</button>
+            <button type="button" class="vx-chip" data-reason="Not my personal style">Not my style</button>
+            <button type="button" class="vx-chip" data-reason="Prefer another brand">Different brand</button>
+          </div>
+          <input type="hidden" id="vx-selected-reason-{{ section.id }}" value="Price point too high">
+        </div>
+
+        <div class="vx-form-group">
+          <label>Additional Notes (Optional)</label>
+          <textarea class="vx-input-field" id="vx-feedback-notes-{{ section.id }}" rows="3" placeholder="Tell us what you are looking for instead..."></textarea>
+        </div>
+
+        <div class="vx-form-group">
+          <label>Notify me if price drops or restocks</label>
+          <input type="email" class="vx-input-field" id="vx-feedback-email-{{ section.id }}" placeholder="Optional: your email address">
+        </div>
+
+        <button type="submit" class="vx-btn vx-btn-not-interested" style="width: 100%; background: var(--vx-brass); color: var(--vx-ink); border: none;">
+          Submit Feedback
+        </button>
+      </form>
+
+      <div id="vx-feedback-success-{{ section.id }}" style="display: none; text-align: center; padding: 20px 0;">
+        <h4 style="font-family: 'Fraunces', serif; font-size: 22px; margin-bottom: 8px;">Thank You</h4>
+        <p style="color: var(--vx-bone-dim); font-size: 14px;">Your feedback has been submitted to the Vixara curation team.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const sectionId = "{{ section.id }}";
+    
+    // Elements
+    const modalInterested = document.getElementById(`vx-modal-interested-${sectionId}`);
+    const modalFeedback = document.getElementById(`vx-modal-feedback-${sectionId}`);
+    
+    const openInterested = document.getElementById(`vx-open-interested-${sectionId}`);
+    const openFeedback = document.getElementById(`vx-open-feedback-${sectionId}`);
+    const closeInterested = document.getElementById(`vx-close-interested-${sectionId}`);
+    const closeFeedback = document.getElementById(`vx-close-feedback-${sectionId}`);
+
+    // Interested modal actions
+    if(openInterested) {
+      openInterested.addEventListener('click', () => modalInterested.classList.add('active'));
+    }
+    if(closeInterested) {
+      closeInterested.addEventListener('click', () => modalInterested.classList.remove('active'));
+    }
+
+    // Feedback modal actions
+    if(openFeedback) {
+      openFeedback.addEventListener('click', () => modalFeedback.classList.add('active'));
+    }
+    if(closeFeedback) {
+      closeFeedback.addEventListener('click', () => modalFeedback.classList.remove('active'));
+    }
+
+    // Size Selector
+    const sizeBtns = modalInterested.querySelectorAll('.vx-size-btn');
+    const inputSize = document.getElementById(`vx-selected-size-${sectionId}`);
+    sizeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        sizeBtns.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        inputSize.value = btn.dataset.size;
+      });
+    });
+
+    // Communication Preference Selector
+    const prefBtns = modalInterested.querySelectorAll('.vx-pref-btn');
+    const inputPref = document.getElementById(`vx-selected-pref-${sectionId}`);
+    prefBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        prefBtns.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        inputPref.value = btn.dataset.pref;
+      });
+    });
+
+    // Interested Form Submit
+    const interestedForm = document.getElementById(`vx-interested-form-${sectionId}`);
+    const formStep = document.getElementById(`vx-chat-step-form-${sectionId}`);
+    const successStep = document.getElementById(`vx-chat-step-success-${sectionId}`);
+
+    if (interestedForm) {
+      interestedForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = document.getElementById(`vx-client-email-${sectionId}`).value;
+        const size = inputSize.value;
+        const pref = inputPref.value;
+
+        // Log lead data or send to Shopify backend webhook
+        console.log('[Vixara Concierge Lead Captured]', { email, size, pref, sectionId });
+
+        // Show Success Step with Discount Code
+        formStep.style.display = 'none';
+        successStep.style.display = 'block';
+      });
+    }
+
+    // Copy Code Button
+    const copyBtn = document.getElementById(`vx-copy-code-btn-${sectionId}`);
+    if (copyBtn) {
+      copyBtn.addEventListener('click', function() {
+        const codeText = document.getElementById(`vx-code-text-${sectionId}`).innerText;
+        navigator.clipboard.writeText(codeText);
+        copyBtn.innerText = 'COPIED!';
+        setTimeout(() => { copyBtn.innerText = 'COPY'; }, 2000);
+      });
+    }
+
+    // Feedback Chip Selection
+    const chips = modalFeedback.querySelectorAll('.vx-chip');
+    const inputReason = document.getElementById(`vx-selected-reason-${sectionId}`);
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+        inputReason.value = chip.dataset.reason;
+      });
+    });
+
+    // Feedback Submit
+    const feedbackForm = document.getElementById(`vx-feedback-form-${sectionId}`);
+    const feedbackSuccess = document.getElementById(`vx-feedback-success-${sectionId}`);
+    if (feedbackForm) {
+      feedbackForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const reason = inputReason.value;
+        const notes = document.getElementById(`vx-feedback-notes-${sectionId}`).value;
+        const email = document.getElementById(`vx-feedback-email-${sectionId}`).value;
+
+        console.log('[Vixara Feedback Submitted]', { reason, notes, email });
+
+        feedbackForm.style.display = 'none';
+        feedbackSuccess.style.display = 'block';
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Vixara Product Interest",
+  "settings": [
+    {
+      "type": "text",
+      "id": "brand_name",
+      "label": "Brand Name",
+      "default": "Loro Piana"
+    },
+    {
+      "type": "text",
+      "id": "product_title",
+      "label": "Product Title",
+      "default": "Cashmere Overcoat"
+    },
+    {
+      "type": "text",
+      "id": "product_price",
+      "label": "Price ($)",
+      "default": "3,240"
+    },
+    {
+      "type": "text",
+      "id": "compare_at_price",
+      "label": "Compare at Price ($)",
+      "default": "3,800"
+    },
+    {
+      "type": "text",
+      "id": "sku_code",
+      "label": "SKU / Provenance ID",
+      "default": "VX-0417"
+    },
+    {
+      "type": "textarea",
+      "id": "product_description",
+      "label": "Product Description",
+      "default": "Inspected under Vixara's three-point standard: material verification, label hardware check, and documented provenance."
+    },
+    {
+      "type": "image_picker",
+      "id": "product_image",
+      "label": "Product Image"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#0b0b0c"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color (Brass)",
+      "default": "#b6905a"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vixara Product Interest",
+      "category": "Product"
+    }
+  ]
+}
+{% endschema %}

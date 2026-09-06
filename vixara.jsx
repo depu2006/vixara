@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
   ShieldCheck, Menu, X, ArrowRight, ChevronLeft, ChevronRight,
-  Upload, RefreshCw, Shirt, Sparkles, Trash2, Heart
+  Upload, RefreshCw, Shirt, Sparkles, Trash2, Heart, MessageSquare,
+  ThumbsDown, CheckCircle2, Copy, Rocket, Sliders, Zap, Tag
 } from "lucide-react";
+import { launchProductWithPrice, registerCustomerInterestLead, calculateLaunchPricing } from "./backend/shopify-backend-launch.js";
 
 /* Shared editorial shot used as the "Styled" gallery view — a stand-in
    until real per-SKU editorial photography exists. */
@@ -296,6 +298,315 @@ function FavoritesDrawer({ open, onClose, favorites, onToggleFavorite }) {
         )}
       </div>
     </div>
+  );
+}
+
+function ShopifyCustomSection() {
+  const [priceInput, setPriceInput] = useState(3240);
+  const [activePrice, setActivePrice] = useState(3240);
+  const [discountPercent, setDiscountPercent] = useState(15);
+  const [launchModalOpen, setLaunchModalOpen] = useState(false);
+  const [launchResult, setLaunchResult] = useState(null);
+
+  // Interested Drawer State
+  const [interestedOpen, setInterestedOpen] = useState(false);
+  const [size, setSize] = useState("M");
+  const [channel, setChannel] = useState("Email");
+  const [clientEmail, setClientEmail] = useState("");
+  const [interestedSubmitted, setInterestedSubmitted] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  // Not Interested Drawer State
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [reason, setReason] = useState("Price point too high");
+  const [notes, setNotes] = useState("");
+  const [feedbackEmail, setFeedbackEmail] = useState("");
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+
+  const pricing = calculateLaunchPricing(activePrice, discountPercent);
+
+  const handleLaunch = async (e) => {
+    e.preventDefault();
+    const result = await launchProductWithPrice({
+      newPrice: priceInput,
+      discountPercent: discountPercent,
+      sku: "VX-0417"
+    });
+    setActivePrice(priceInput);
+    setLaunchResult(result);
+    setLaunchModalOpen(true);
+  };
+
+  const handleInterestedSubmit = (e) => {
+    e.preventDefault();
+    if (!clientEmail) return;
+    registerCustomerInterestLead({ email: clientEmail, size, channel, price: activePrice });
+    setInterestedSubmitted(true);
+  };
+
+  const handleFeedbackSubmit = (e) => {
+    e.preventDefault();
+    setFeedbackSubmitted(true);
+  };
+
+  const copyDiscountCode = () => {
+    navigator.clipboard.writeText(pricing.discountCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <section className="shopify-section-container" id="shopify-section">
+      <div className="wrap">
+        <div className="shopify-admin-bar">
+          <div className="admin-bar-title">
+            <Rocket size={18} className="accent-icon" />
+            <span><strong>Shopify One-Click Launch Engine</strong> • Dynamic Pricing &amp; Section Controller</span>
+          </div>
+          <form className="admin-bar-controls" onSubmit={handleLaunch}>
+            <label className="admin-label">
+              <span>Launch Price ($)</span>
+              <input
+                type="number"
+                value={priceInput}
+                onChange={(e) => setPriceInput(Number(e.target.value))}
+                className="admin-input"
+                min="100"
+              />
+            </label>
+            <label className="admin-label">
+              <span>VIP Discount (%)</span>
+              <input
+                type="number"
+                value={discountPercent}
+                onChange={(e) => setDiscountPercent(Number(e.target.value))}
+                className="admin-input"
+                min="1"
+                max="90"
+              />
+            </label>
+            <button type="submit" className="btn-primary admin-btn">
+              <Zap size={14} /> One-Click Launch
+            </button>
+          </form>
+        </div>
+
+        <div className="section-head" style={{ border: "none", marginBottom: 24, paddingTop: 10 }}>
+          <div>
+            <span className="tag">Shopify Custom Section</span>
+            <h2>Vixara Concierge Product Page</h2>
+          </div>
+          <p>Test the interactive <strong>Interested</strong> chat funnel &amp; <strong>Not Interested</strong> feedback loop live.</p>
+        </div>
+
+        <div className="shopify-card-preview">
+          <div className="shopify-card-img">
+            <img src="https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?auto=format&fit=crop&w=900&q=70" alt="Cashmere Overcoat" />
+            <div className="seal-badge">AUTHENTICATED • VX-0417</div>
+          </div>
+          <div className="shopify-card-info">
+            <span className="piece-brand">Loro Piana</span>
+            <h3 className="display" style={{ fontSize: 34, margin: "8px 0 16px" }}>Cashmere Overcoat</h3>
+            <div className="shopify-price-display">
+              <span className="current-price">${pricing.finalPrice.toLocaleString()}</span>
+              <span className="original-price">${pricing.originalPrice.toLocaleString()}</span>
+              <span className="discount-tag">{pricing.discountPercent}% OFF VIP</span>
+            </div>
+            <p className="modal-desc" style={{ marginBottom: 28 }}>
+              Inspected under Vixara's three-point standard: material verification, label and hardware cross-check,
+              and a documented chain of custody. Reserved pieces include guaranteed size locking &amp; priority concierge.
+            </p>
+            <div className="shopify-btn-group">
+              <button className="btn-primary" onClick={() => setInterestedOpen(true)}>
+                <MessageSquare size={16} /> Interested • VIP Perks
+              </button>
+              <button className="btn-ghost" onClick={() => setFeedbackOpen(true)}>
+                <ThumbsDown size={16} /> Not Interested
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Interested Modal */}
+      {interestedOpen && (
+        <div className="modal-backdrop" onClick={() => setInterestedOpen(false)}>
+          <div className="modal-card-custom" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setInterestedOpen(false)}><X size={18} /></button>
+            
+            {!interestedSubmitted ? (
+              <form onSubmit={handleInterestedSubmit}>
+                <div className="chat-modal-head">
+                  <h3 className="display">Vixara Concierge Chat</h3>
+                  <p>Reserve size &amp; receive dynamic {pricing.discountPercent}% VIP discount</p>
+                </div>
+
+                <div className="form-group-custom">
+                  <label>Select Preferred Size</label>
+                  <div className="chip-row">
+                    {["S", "M", "L", "XL", "Custom Fit"].map((s) => (
+                      <button
+                        type="button"
+                        key={s}
+                        className={`chip-btn ${size === s ? "active" : ""}`}
+                        onClick={() => setSize(s)}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="form-group-custom">
+                  <label>Communication Preference</label>
+                  <div className="chip-row">
+                    {["Email", "SMS", "WhatsApp"].map((c) => (
+                      <button
+                        type="button"
+                        key={c}
+                        className={`chip-btn ${channel === c ? "active" : ""}`}
+                        onClick={() => setChannel(c)}
+                      >
+                        {c}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="form-group-custom">
+                  <label>Your Email / Contact Information</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="client@domain.com"
+                    value={clientEmail}
+                    onChange={(e) => setClientEmail(e.target.value)}
+                    className="custom-input"
+                  />
+                </div>
+
+                <button type="submit" className="btn-primary" style={{ width: "100%", justifyContent: "center" }}>
+                  Unlock Discount &amp; Reserve Size
+                </button>
+              </form>
+            ) : (
+              <div>
+                <div className="chat-modal-head">
+                  <h3 className="display">Size {size} Reserved ✓</h3>
+                  <p>Client contact recorded via {channel}.</p>
+                </div>
+                <div className="discount-reward-box">
+                  <span className="reward-label">{pricing.discountPercent}% OFF VIP DISCOUNT CODE</span>
+                  <div className="discount-code-badge">
+                    <span>{pricing.discountCode}</span>
+                    <button type="button" className="copy-btn" onClick={copyDiscountCode}>
+                      {copied ? "COPIED!" : <Copy size={14} />}
+                    </button>
+                  </div>
+                  <p className="reward-note">Final Reserved Price: <strong>${pricing.finalPrice.toLocaleString()}</strong> (Saved ${pricing.discountAmount.toLocaleString()})</p>
+                  <button className="btn-primary" style={{ width: "100%", justifyContent: "center", marginTop: 16 }} onClick={() => setInterestedOpen(false)}>
+                    <CheckCircle2 size={16} /> Proceed with Reserved Code
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Not Interested Feedback Modal */}
+      {feedbackOpen && (
+        <div className="modal-backdrop" onClick={() => setFeedbackOpen(false)}>
+          <div className="modal-card-custom" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setFeedbackOpen(false)}><X size={18} /></button>
+            {!feedbackSubmitted ? (
+              <form onSubmit={handleFeedbackSubmit}>
+                <div className="chat-modal-head">
+                  <h3 className="display">Product Feedback</h3>
+                  <p>Help us curate pieces tailored to your exact taste.</p>
+                </div>
+
+                <div className="form-group-custom">
+                  <label>Why are you not interested in this piece?</label>
+                  <div className="chip-row vertical">
+                    {[
+                      "Price point too high",
+                      "Size unavailable",
+                      "Not my personal style",
+                      "Looking for another brand"
+                    ].map((r) => (
+                      <button
+                        type="button"
+                        key={r}
+                        className={`chip-btn full ${reason === r ? "active" : ""}`}
+                        onClick={() => setReason(r)}
+                      >
+                        {r}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="form-group-custom">
+                  <label>Additional Notes (Optional)</label>
+                  <textarea
+                    rows={3}
+                    placeholder="Tell us what you are looking for..."
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    className="custom-input"
+                  />
+                </div>
+
+                <div className="form-group-custom">
+                  <label>Notify me if price drops</label>
+                  <input
+                    type="email"
+                    placeholder="Optional: client@domain.com"
+                    value={feedbackEmail}
+                    onChange={(e) => setFeedbackEmail(e.target.value)}
+                    className="custom-input"
+                  />
+                </div>
+
+                <button type="submit" className="btn-primary" style={{ width: "100%", justifyContent: "center" }}>
+                  Submit Feedback
+                </button>
+              </form>
+            ) : (
+              <div style={{ textAlign: "center", padding: "20px 0" }}>
+                <CheckCircle2 size={38} style={{ color: "var(--brass-bright)", marginBottom: 12 }} />
+                <h3 className="display" style={{ fontSize: 24, margin: "0 0 8px" }}>Feedback Received</h3>
+                <p style={{ color: "var(--bone-dim)", fontSize: 14 }}>Thank you for helping us refine our Vixara catalog selection.</p>
+                <button className="btn-ghost" style={{ marginTop: 20 }} onClick={() => setFeedbackOpen(false)}>Close Window</button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Admin Launch Payload Modal */}
+      {launchModalOpen && launchResult && (
+        <div className="modal-backdrop" onClick={() => setLaunchModalOpen(false)}>
+          <div className="modal-card-custom wide" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setLaunchModalOpen(false)}><X size={18} /></button>
+            <div className="chat-modal-head">
+              <h3 className="display" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <Rocket size={22} className="accent-icon" /> Shopify GraphQL Launch Dispatched
+              </h3>
+              <p>{launchResult.message}</p>
+            </div>
+            <div className="payload-box">
+              <div className="payload-title"><Sliders size={14} /> Shopify Admin GraphQL Payload Sent</div>
+              <pre>{JSON.stringify(launchResult.variables, null, 2)}</pre>
+            </div>
+            <button className="btn-primary" style={{ width: "100%", justifyContent: "center", marginTop: 16 }} onClick={() => setLaunchModalOpen(false)}>
+              Close &amp; View Updated Section
+            </button>
+          </div>
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -608,12 +919,52 @@ export default function VixaraSite() {
         .favorite-item{display:grid;grid-template-columns:60px 1fr auto;gap:12px;padding-bottom:16px;border-bottom:1px solid var(--hairline);} 
         .favorite-item img{width:60px;height:74px;object-fit:cover;filter:grayscale(15%) brightness(0.88);} 
         .favorite-item-name{font-family:'Fraunces',serif;font-size:16px;margin:3px 0 6px;} 
+
+        .shopify-section-container{padding:60px 0;background:var(--ink-2);border-top:1px solid var(--hairline-strong);border-bottom:1px solid var(--hairline-strong);}
+        .shopify-admin-bar{background:rgba(23,23,26,0.9);border:1px solid var(--brass);padding:20px 24px;margin-bottom:30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px;}
+        .admin-bar-title{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--bone);}
+        .accent-icon{color:var(--brass-bright);}
+        .admin-bar-controls{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+        .admin-label{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--bone-dim);text-transform:uppercase;letter-spacing:0.06em;}
+        .admin-input{background:var(--ink);border:1px solid var(--hairline-strong);color:var(--bone);padding:8px 12px;width:100px;font-family:'IBM Plex Mono',monospace;font-size:13px;}
+        .shopify-card-preview{display:grid;grid-template-columns:1fr 1fr;gap:40px;background:var(--card);border:1px solid var(--hairline-strong);padding:32px;}
+        @media(max-width:860px){.shopify-card-preview{grid-template-columns:1fr;padding:20px;}}
+        .shopify-card-img{position:relative;aspect-ratio:4/5;overflow:hidden;background:var(--ink);}
+        .shopify-card-img img{width:100%;height:100%;object-fit:cover;filter:grayscale(10%);}
+        .seal-badge{position:absolute;top:16px;right:16px;background:rgba(11,11,12,0.8);border:1px solid var(--brass-bright);color:var(--brass-bright);padding:6px 12px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;}
+        .shopify-card-info{display:flex;flex-direction:column;justify-content:center;}
+        .shopify-price-display{display:flex;align-items:center;gap:14px;margin-bottom:20px;font-family:'IBM Plex Mono',monospace;}
+        .current-price{font-size:26px;color:var(--bone);font-weight:600;}
+        .original-price{font-size:18px;color:var(--bone-dim);text-decoration:line-through;}
+        .discount-tag{background:rgba(182,144,90,0.15);border:1px solid var(--brass);color:var(--brass-bright);padding:4px 10px;font-size:11px;letter-spacing:0.08em;}
+        .shopify-btn-group{display:flex;gap:14px;flex-wrap:wrap;}
+        .modal-card-custom{background:var(--ink-2);border:1px solid var(--hairline-strong);width:100%;max-width:500px;padding:32px;position:relative;}
+        .modal-card-custom.wide{max-width:640px;}
+        .chat-modal-head{margin-bottom:20px;border-bottom:1px solid var(--hairline);padding-bottom:14px;}
+        .chat-modal-head h3{font-size:22px;margin:0 0 6px;}
+        .chat-modal-head p{font-size:13px;color:var(--brass-bright);margin:0;}
+        .form-group-custom{margin-bottom:18px;}
+        .form-group-custom label{display:block;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--bone-dim);margin-bottom:8px;}
+        .chip-row{display:flex;gap:8px;flex-wrap:wrap;}
+        .chip-row.vertical{flex-direction:column;}
+        .chip-btn{border:1px solid var(--hairline-strong);background:transparent;color:var(--bone-dim);padding:8px 14px;font-size:12px;cursor:pointer;transition:all 0.2s;}
+        .chip-btn.active{background:var(--brass);border-color:var(--brass);color:var(--ink);font-weight:600;}
+        .chip-btn.full{width:100%;text-align:left;}
+        .custom-input{width:100%;background:var(--ink);border:1px solid var(--hairline-strong);padding:12px 14px;color:var(--bone);font-size:13px;font-family:inherit;}
+        .discount-reward-box{background:linear-gradient(135deg, rgba(182,144,90,0.12) 0%, rgba(23,23,26,0.9) 100%);border:1px dashed var(--brass);padding:20px;text-align:center;}
+        .reward-label{font-size:11px;letter-spacing:0.12em;color:var(--bone-dim);text-transform:uppercase;}
+        .discount-code-badge{background:var(--ink);border:1px solid var(--brass);color:var(--brass-bright);font-family:'IBM Plex Mono',monospace;font-size:20px;padding:10px;margin:12px 0;display:flex;align-items:center;justify-content:center;gap:12px;}
+        .copy-btn{background:var(--brass);color:var(--ink);border:none;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;}
+        .reward-note{font-size:13px;color:var(--bone-dim);margin:0;}
+        .payload-box{background:var(--ink);border:1px solid var(--hairline-strong);padding:16px;margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--brass-bright);max-height:220px;overflow:auto;}
+        .payload-title{font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--bone-dim);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
       `}</style>
 
       <header className={scrolled ? "scrolled" : ""}>
         <div className="logo">VIX<em>ARA</em></div>
         <div className="nav-links">
           <nav><ul>
+            <li><a href="#shopify-section" onClick={(e) => scrollToSection('#shopify-section', e)}>Shopify Section</a></li>
             <li><a href="#collection" onClick={(e) => scrollToSection('#collection', e)}>Collection</a></li>
             <li><a href="#manifesto" onClick={(e) => scrollToSection('#manifesto', e)}>Provenance</a></li>
             <li><a href="#membership" onClick={(e) => scrollToSection('#membership', e)}>Access</a></li>
@@ -663,6 +1014,8 @@ export default function VixaraSite() {
           {[...BRANDS, ...BRANDS].map((b, i) => <span key={i}>{b}</span>)}
         </div>
       </div>
+
+      <ShopifyCustomSection />
 
       <section className="section" id="collection">
         <div className="wrap">
