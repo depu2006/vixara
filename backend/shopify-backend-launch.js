@@ -1,19 +1,85 @@
 /**
- * Vixara Shopify Backend Launch Service & One-Click Automation
+ * Vixara Shopify Backend Launch Service & Customer Message Database Store
  * File: backend/shopify-backend-launch.js
- * 
- * Provides automated Shopify Admin API integrations:
- * - Dynamic price calculation & updates
- * - One-click product publishing routine
- * - Automated dynamic price discount rule creation
- * - Customer interest lead payload dispatch
  */
+
+const STORAGE_KEY_MESSAGES = "vixara_customer_messages_db";
+
+export const INITIAL_MOCK_LEADS = [
+  {
+    id: "MSG-1082",
+    type: "Concierge Request",
+    client: "elena.v@hautecouture.co",
+    channel: "WhatsApp",
+    size: "S",
+    details: "Reserved Cashmere Overcoat (Size S). Coupon VIXARA-VIP-15 claimed.",
+    timestamp: "2026-09-06T18:42:00Z",
+    status: "QUALIFIED_VIP"
+  },
+  {
+    id: "MSG-1081",
+    type: "Product Feedback",
+    client: "marcus.k@designers.io",
+    channel: "Email",
+    size: "N/A",
+    details: "Not interested in VX-0417: Price point too high. Requested price-drop notification if under $2,600.",
+    timestamp: "2026-09-06T17:15:00Z",
+    status: "PRICE_ALERT_SET"
+  },
+  {
+    id: "MSG-1080",
+    type: "Access Request",
+    client: "julian.rose@atelier.com",
+    channel: "Email",
+    size: "N/A",
+    details: "Requested Private Access to the next curated drop.",
+    timestamp: "2026-09-06T16:05:00Z",
+    status: "PENDING_INVITE"
+  }
+];
+
+/**
+ * Retrieves all stored customer messages from localStorage or returns defaults.
+ */
+export function getStoredMessages() {
+  if (typeof window === "undefined") return INITIAL_MOCK_LEADS;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_MESSAGES);
+    if (!raw) {
+      localStorage.setItem(STORAGE_KEY_MESSAGES, JSON.stringify(INITIAL_MOCK_LEADS));
+      return INITIAL_MOCK_LEADS;
+    }
+    return JSON.parse(raw);
+  } catch (err) {
+    console.error("Error reading customer messages db:", err);
+    return INITIAL_MOCK_LEADS;
+  }
+}
+
+/**
+ * Saves a new customer message or lead entry into the database.
+ */
+export function saveCustomerMessage(entry) {
+  const current = getStoredMessages();
+  const newMsg = {
+    id: `MSG-${Date.now().toString(36).toUpperCase()}`,
+    timestamp: new Date().toISOString(),
+    status: entry.status || "NEW",
+    ...entry
+  };
+  const updated = [newMsg, ...current];
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.setItem(STORAGE_KEY_MESSAGES, JSON.stringify(updated));
+    } catch (err) {
+      console.error("Error saving customer message:", err);
+    }
+  }
+  return newMsg;
+}
 
 /**
  * Calculates discount pricing based on input launch price.
- * @param {number} inputPrice - Numeric price (e.g. 3240)
- * @param {number} discountPercent - Discount percentage (e.g. 15)
- * @returns {Object} Object containing formatted price strings and discount amounts
  */
 export function calculateLaunchPricing(inputPrice, discountPercent = 15) {
   const numericPrice = parseFloat(inputPrice) || 0;
@@ -33,13 +99,6 @@ export function calculateLaunchPricing(inputPrice, discountPercent = 15) {
 
 /**
  * Simulates / executes a Shopify Admin API GraphQL product update and launch trigger.
- * 
- * @param {Object} params
- * @param {string} params.productId - Shopify Product GID (e.g. "gid://shopify/Product/12345678")
- * @param {string|number} params.newPrice - Updated price input
- * @param {string} params.sku - SKU code (e.g. "VX-0417")
- * @param {number} params.discountPercent - VIP discount rate
- * @returns {Promise<Object>} Launch result payload
  */
 export async function launchProductWithPrice({
   productId = "gid://shopify/Product/vx-0417",
@@ -50,7 +109,6 @@ export async function launchProductWithPrice({
   const pricing = calculateLaunchPricing(newPrice, discountPercent);
   const timestamp = new Date().toISOString();
 
-  // Simulated Shopify GraphQL Admin API payload
   const shopifyGraphQLMutation = `
     mutation productUpdate($input: ProductInput!) {
       productUpdate(input: $input) {
@@ -90,7 +148,6 @@ export async function launchProductWithPrice({
     }
   };
 
-  // Log automated execution payload
   console.log('[Vixara Shopify Backend API Triggered]', {
     action: 'ONE_CLICK_LAUNCH',
     timestamp,
@@ -110,19 +167,15 @@ export async function launchProductWithPrice({
 }
 
 /**
- * Processes incoming customer interest lead & generates a record.
- * 
- * @param {Object} leadData
- * @returns {Object} Lead confirmation status
+ * Processes incoming customer interest lead & saves into database.
  */
 export function registerCustomerInterestLead(leadData) {
-  const leadId = `LEAD-${Date.now().toString(36).toUpperCase()}`;
-  console.log(`[Vixara Lead Saved] ID: ${leadId}`, leadData);
-  
-  return {
-    success: true,
-    leadId,
-    timestamp: new Date().toISOString(),
-    status: 'QUALIFIED_VIP'
-  };
+  return saveCustomerMessage({
+    type: "Concierge Request",
+    client: leadData.email || "anonymous@client.com",
+    channel: leadData.channel || "Email",
+    size: leadData.size || "M",
+    details: `Reserved piece at price $${leadData.price || '3,240'}. Coupon generated.`,
+    status: "QUALIFIED_VIP"
+  });
 }

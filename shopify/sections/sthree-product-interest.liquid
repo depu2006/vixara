@@ -1,0 +1,337 @@
+{% schema %}
+{
+  "name": "STHREE Product Interest",
+  "settings": [
+    {
+      "type": "text",
+      "id": "brand_name",
+      "label": "Brand Name",
+      "default": "STHREE"
+    },
+    {
+      "type": "text",
+      "id": "hero_title",
+      "label": "Hero Title",
+      "default": "The Maroon Collection"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_subtitle",
+      "label": "Hero Subtitle",
+      "default": "Discover the latest in premium D2C Indian wear."
+    },
+    {
+      "type": "color",
+      "id": "color_primary",
+      "label": "Primary Color",
+      "default": "#800000"
+    },
+    {
+      "type": "color",
+      "id": "color_secondary",
+      "label": "Secondary Color",
+      "default": "#f4e1e1"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Default",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+  :root {
+    --primary: {{ section.settings.color_primary }};
+    --secondary: {{ section.settings.color_secondary }};
+    --bg-color: #faf9f6;
+    --text-color: #333;
+    --border: #e0d8d8;
+  }
+  .sthree-section {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .sthree-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .sthree-header h1 {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 10px;
+  }
+  .sthree-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+  .sthree-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    padding: 20px;
+    text-align: center;
+    border-radius: 8px;
+  }
+  .sthree-card h3 {
+    margin-top: 15px;
+    color: var(--primary);
+  }
+  .sthree-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+  }
+  .sthree-btn {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  .sthree-btn-primary {
+    background-color: var(--primary);
+    color: #fff;
+  }
+  .sthree-btn-secondary {
+    background-color: transparent;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+  }
+  .sthree-modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+  }
+  .sthree-modal.active {
+    display: flex;
+  }
+  .sthree-modal-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+  }
+  .sthree-close {
+    position: absolute;
+    top: 15px; right: 15px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #999;
+  }
+  .sthree-form-group {
+    margin-bottom: 15px;
+  }
+  .sthree-form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+  }
+  .sthree-form-group input, .sthree-form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+  .sthree-chip-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .sthree-chip {
+    padding: 8px 15px;
+    background: var(--secondary);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+  .sthree-chip.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+  .sthree-counter {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: var(--primary);
+    font-weight: bold;
+  }
+</style>
+
+<div class="sthree-section">
+  <div class="sthree-header">
+    <h1>{{ section.settings.brand_name }}</h1>
+    <h2>{{ section.settings.hero_title }}</h2>
+    <p>{{ section.settings.hero_subtitle }}</p>
+  </div>
+
+  <div class="sthree-grid">
+    <div class="sthree-card">
+      <div style="background: #e9e9e9; height: 300px; border-radius: 4px;"></div>
+      <h3>Party / Show-off</h3>
+    </div>
+    <div class="sthree-card">
+      <div style="background: #e9e9e9; height: 300px; border-radius: 4px;"></div>
+      <h3>Modest / Coverage</h3>
+    </div>
+    <div class="sthree-card">
+      <div style="background: #e9e9e9; height: 300px; border-radius: 4px;"></div>
+      <h3>Casual</h3>
+    </div>
+    <div class="sthree-card">
+      <div style="background: #e9e9e9; height: 300px; border-radius: 4px;"></div>
+      <h3>Pure Western</h3>
+    </div>
+  </div>
+
+  <div class="sthree-actions">
+    <button class="sthree-btn sthree-btn-primary" onclick="openModal('interestModal')">Interested</button>
+    <button class="sthree-btn sthree-btn-secondary" onclick="openModal('feedbackModal')">Not Interested</button>
+  </div>
+  
+  <div id="interestCounter" class="sthree-counter"></div>
+</div>
+
+<!-- Interest Modal -->
+<div id="interestModal" class="sthree-modal">
+  <div class="sthree-modal-content">
+    <span class="sthree-close" onclick="closeModal('interestModal')">&times;</span>
+    <h2 style="color: var(--primary); margin-top: 0;">Join the Waitlist</h2>
+    <form id="interestForm">
+      <div class="sthree-form-group">
+        <label>Email (Required)</label>
+        <input type="email" id="int_email" required>
+      </div>
+      <div class="sthree-form-group">
+        <label>Size (Optional)</label>
+        <select id="int_size">
+          <option value="">Select Size</option>
+          <option value="XS">XS</option>
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="XL">XL</option>
+        </select>
+      </div>
+      <div class="sthree-form-group">
+        <label>Communication Preference (Optional)</label>
+        <select id="int_comms">
+          <option value="WhatsApp">WhatsApp</option>
+          <option value="Email">Email</option>
+          <option value="SMS">SMS</option>
+        </select>
+      </div>
+      <button type="submit" class="sthree-btn sthree-btn-primary" style="width: 100%;">Submit Interest</button>
+    </form>
+    <div id="interestSuccess" style="display: none; margin-top: 20px; text-align: center;">
+      <p style="color: green; font-weight: bold;">Thank you! Your interest is recorded.</p>
+      <p>Use code <strong>STHREE-VIP-15</strong> for 15% off at launch.</p>
+      <p style="font-size: 0.8rem; color: #666;">Share with a friend for an extra 5% off!</p>
+    </div>
+  </div>
+</div>
+
+<!-- Feedback Modal -->
+<div id="feedbackModal" class="sthree-modal">
+  <div class="sthree-modal-content">
+    <span class="sthree-close" onclick="closeModal('feedbackModal')">&times;</span>
+    <h2 style="color: var(--primary); margin-top: 0;">Help Us Improve</h2>
+    <p>Why aren't you interested in this collection?</p>
+    
+    <div class="sthree-chip-container" id="feedbackChips">
+      <div class="sthree-chip" data-val="Price">Price too high</div>
+      <div class="sthree-chip" data-val="Style">Not my style</div>
+      <div class="sthree-chip" data-val="Size">Size not available</div>
+      <div class="sthree-chip" data-val="Fabric">Fabric preference</div>
+      <div class="sthree-chip" data-val="Other">Other</div>
+    </div>
+    
+    <button id="submitFeedback" class="sthree-btn sthree-btn-primary" style="width: 100%; margin-top: 20px;">Submit Feedback</button>
+    
+    <div id="feedbackSuccess" style="display: none; margin-top: 20px; text-align: center;">
+      <p style="color: green; font-weight: bold;">Thank you for your feedback!</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openModal(id) {
+    document.getElementById(id).classList.add('active');
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+  }
+
+  // Interest Form Submit
+  document.getElementById('interestForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = document.getElementById('int_email').value;
+    const size = document.getElementById('int_size').value;
+    const commsPreference = document.getElementById('int_comms').value;
+
+    fetch('http://localhost:3000/api/interest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, size, commsPreference })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if(data.success) {
+        document.getElementById('interestForm').style.display = 'none';
+        document.getElementById('interestSuccess').style.display = 'block';
+        document.getElementById('interestCounter').innerText = data.interestCount + " people are interested in this drop!";
+      }
+    })
+    .catch(err => console.error(err));
+  });
+
+  // Feedback Chips Logic
+  let selectedFeedback = '';
+  document.querySelectorAll('#feedbackChips .sthree-chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+      document.querySelectorAll('#feedbackChips .sthree-chip').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      selectedFeedback = this.getAttribute('data-val');
+    });
+  });
+
+  // Feedback Submit
+  document.getElementById('submitFeedback').addEventListener('click', function() {
+    if (!selectedFeedback) return alert('Please select a reason.');
+    
+    fetch('http://localhost:3000/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reason: selectedFeedback })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if(data.success) {
+        document.getElementById('feedbackChips').style.display = 'none';
+        document.getElementById('submitFeedback').style.display = 'none';
+        document.getElementById('feedbackSuccess').style.display = 'block';
+      }
+    })
+    .catch(err => console.error(err));
+  });
+</script>
