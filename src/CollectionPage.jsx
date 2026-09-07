@@ -22,7 +22,7 @@ export default function CollectionPage() {
   const [interestedOpen, setInterestedOpen] = useState(false);
   const [selectedSize, setSelectedSize] = useState("M");
   const [channel, setChannel] = useState("WhatsApp");
-  const [emailInput, setEmailInput] = useState("");
+  const [contactInput, setContactInput] = useState("");
   const [interestedSubmitted, setInterestedSubmitted] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -67,11 +67,11 @@ export default function CollectionPage() {
 
   const handleInterestedSubmit = (e) => {
     e.preventDefault();
-    if (!emailInput) return;
+    if (!contactInput) return;
     fetch(`${API_URL}/api/interest`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: emailInput, size: selectedSize, channel, price: selectedProduct?.price, productId: selectedProduct?.id })
+      body: JSON.stringify({ contact: contactInput, size: selectedSize, commsPreference: channel, price: selectedProduct?.price, productId: selectedProduct?.id })
     }).catch(err => console.error(err));
     setInterestedSubmitted(true);
   };
@@ -247,8 +247,16 @@ export default function CollectionPage() {
                       </div>
                     </div>
                     <div className="form-group-custom">
-                      <label>Your Contact / Email</label>
-                      <input type="email" required placeholder="name@domain.com" value={emailInput} onChange={e => setEmailInput(e.target.value)} className="custom-input" />
+                      <label>{channel === "Email" ? "Your Email Address" : "Your Phone Number"}</label>
+                      <input
+                        type={channel === "Email" ? "email" : "tel"}
+                        inputMode={channel === "Email" ? "email" : "tel"}
+                        required
+                        placeholder={channel === "Email" ? "name@domain.com" : "+91 98765 43210"}
+                        value={contactInput}
+                        onChange={e => setContactInput(e.target.value)}
+                        className="custom-input"
+                      />
                     </div>
                     <button type="submit" className="btn-primary" style={{ width: "100%", justifyContent: "center" }}>
                       <Zap size={14} /> Unlock 15% Discount &amp; Reserve

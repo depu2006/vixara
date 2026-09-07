@@ -272,7 +272,7 @@ export default function Admin() {
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--hairline)', color: 'var(--bone-dim)', textTransform: 'uppercase', fontSize: '12px', letterSpacing: '0.1em' }}>
                     <th style={{ padding: '12px' }}>ID</th>
-                    <th style={{ padding: '12px' }}>Email</th>
+                    <th style={{ padding: '12px' }}>Contact</th>
                     <th style={{ padding: '12px' }}>Size</th>
                     <th style={{ padding: '12px' }}>Comms Pref</th>
                     <th style={{ padding: '12px' }}>Date</th>

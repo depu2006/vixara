@@ -210,10 +210,11 @@ app.get('/api/feedback', authenticateToken, (req, res) => {
 
 // Shopify Section Routes
 app.post('/api/interest', (req, res) => {
-  const { email, size, commsPreference } = req.body;
-  if (!email) return res.status(400).json({ error: 'Email is required' });
+  const { contact, email, size, commsPreference } = req.body;
+  const contactValue = contact || email;
+  if (!contactValue) return res.status(400).json({ error: 'Contact information is required' });
   
-  db.run('INSERT INTO Leads (email, size, comms_preference) VALUES (?, ?, ?)', [email, size, commsPreference], function(err) {
+  db.run('INSERT INTO Leads (email, size, comms_preference) VALUES (?, ?, ?)', [contactValue, size, commsPreference], function(err) {
     if (err) return res.status(500).json({ error: err.message });
     db.get('SELECT COUNT(*) as count FROM Leads', (err, row) => {
       res.json({ success: true, interestCount: row ? row.count : 1 });
