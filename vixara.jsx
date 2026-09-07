@@ -518,12 +518,12 @@ export default function VixaraSite() {
         <div className="logo">VIX<em>ARA</em></div>
         <div className="nav-links">
           <nav><ul>
-            <li><a href="#shopify-section" onClick={(e) => scrollToSection('#shopify-section', e)}>Shopify Section</a></li>
-            <li><a href="#collection" onClick={(e) => scrollToSection('#collection', e)}>Collection</a></li>
+            <li><Link to="/collection">Collection</Link></li>
             <li><a href="#manifesto" onClick={(e) => scrollToSection('#manifesto', e)}>Provenance</a></li>
             <li><a href="#membership" onClick={(e) => scrollToSection('#membership', e)}>Access</a></li>
+            <li><Link to="/admin">Admin</Link></li>
           </ul></nav>
-          <a href="#membership" className="nav-cta" onClick={(e) => scrollToSection('#membership', e)}>Request Access</a>
+          <Link to="/collection" className="nav-cta">Explore Collection</Link>
         </div>
         <div className="header-actions">
           <button className="icon-btn" aria-label="Open favorites" onClick={() => setFavoritesOpen(true)}>
@@ -539,9 +539,10 @@ export default function VixaraSite() {
       {menuOpen && (
         <div style={{position:"fixed",inset:0,zIndex:200,background:"var(--ink)",display:"flex",flexDirection:"column",padding:"90px 28px 28px"}}>
           <nav style={{display:"flex",flexDirection:"column",gap:28,fontSize:20,fontFamily:"'Fraunces',serif"}}>
-            <a href="#collection" onClick={(e) => scrollToSection('#collection', e)}>Collection</a>
+            <Link to="/collection" onClick={() => setMenuOpen(false)}>Collection</Link>
             <a href="#manifesto" onClick={(e) => scrollToSection('#manifesto', e)}>Provenance</a>
             <a href="#membership" onClick={(e) => scrollToSection('#membership', e)}>Access</a>
+            <Link to="/admin" onClick={() => setMenuOpen(false)}>Admin</Link>
           </nav>
         </div>
       )}
@@ -554,7 +555,7 @@ export default function VixaraSite() {
           <div className="hero-sub">
             <p>Vixara curates a closed circle of premium and designer garments — each one authenticated, catalogued, and sealed before it reaches you.</p>
             <div className="hero-actions">
-              <a href="#collection" className="btn-primary" onClick={(e) => scrollToSection('#collection', e)}>Enter the Collection <ArrowRight size={15} /></a>
+              <Link to="/collection" className="btn-primary">Enter the Collection <ArrowRight size={15} /></Link>
               <a href="#manifesto" className="btn-ghost" onClick={(e) => scrollToSection('#manifesto', e)}>Our Standard</a>
             </div>
           </div>
@@ -573,25 +574,19 @@ export default function VixaraSite() {
         <div className="wrap">
           <Reveal className="section-head">
             <div>
-              <span className="tag">The Current Edit</span>
-              <h2>{filtered.length} piece{filtered.length !== 1 ? "s" : ""}, one standard —<br />nothing enters unverified.</h2>
+              <span className="tag">Curated Spotlight</span>
+              <h2>Featured Edit —<br />nothing enters unverified.</h2>
             </div>
-            <p>Hover any piece to view its authentication seal and provenance code before you commit.</p>
-          </Reveal>
-          <Reveal className="filters">
-            {categories.map(c => (
-              <button
-                key={c}
-                className={`filter-btn ${category === c ? "active" : ""}`}
-                onClick={() => setCategory(c)}
-              >
-                {c}
-              </button>
-            ))}
+            <p>Click any piece for quick view, try-on studio &amp; VIP reservations.</p>
           </Reveal>
         </div>
         <div className="grid">
-          {filtered.map(p => <ProductCard key={p.id} product={p} onOpen={setSelectedProduct} isFavorite={isFavorite(p)} onToggleFavorite={toggleFavorite} />)}
+          {products.slice(0, 4).map(p => <ProductCard key={p.id} product={p} onOpen={setSelectedProduct} isFavorite={isFavorite(p)} onToggleFavorite={toggleFavorite} />)}
+        </div>
+        <div style={{ textAlign: "center", marginTop: 44 }}>
+          <Link to="/collection" className="btn-primary" style={{ padding: "18px 42px", fontSize: 14 }}>
+            Explore Full Collection ({products.length} Pieces) <ArrowRight size={16} />
+          </Link>
         </div>
       </section>
 
