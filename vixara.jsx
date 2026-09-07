@@ -5,7 +5,7 @@ import {
   Upload, RefreshCw, Shirt, Sparkles, Trash2, Heart
 } from "lucide-react";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL || "https://vixara-backend.onrender.com";
 
 /* Shared editorial shot used as the "Styled" gallery view — a stand-in
    until real per-SKU editorial photography exists. */
