@@ -2,7 +2,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import {
   ShieldCheck, Menu, X, ArrowRight, ChevronLeft, ChevronRight,
-  Upload, RefreshCw, Shirt, Sparkles, Trash2, Heart
+  Upload, RefreshCw, Shirt, Sparkles, Trash2, Heart, MessageSquare,
+  ThumbsDown, CheckCircle2, Copy, Zap
 } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL || "https://vixara-backend.onrender.com";
@@ -178,9 +179,27 @@ function ProductModal({ product, onClose, isFavorite, onToggleFavorite }) {
   const [tab, setTab] = useState("gallery");
   const [viewIndex, setViewIndex] = useState(0);
 
+  // Interested Modal State
+  const [interestedOpen, setInterestedOpen] = useState(false);
+  const [selectedSize, setSelectedSize] = useState(product?.size || "M");
+  const [channel, setChannel] = useState("WhatsApp");
+  const [emailInput, setEmailInput] = useState("");
+  const [interestedSubmitted, setInterestedSubmitted] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  // Not Interested Modal State
+  const [notInterestedOpen, setNotInterestedOpen] = useState(false);
+  const [reason, setReason] = useState("Price point too high");
+  const [notes, setNotes] = useState("");
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+
   useEffect(() => {
     setTab("gallery");
     setViewIndex(0);
+    setInterestedOpen(false);
+    setNotInterestedOpen(false);
+    setInterestedSubmitted(false);
+    setFeedbackSubmitted(false);
   }, [product]);
 
   useEffect(() => {
@@ -195,6 +214,42 @@ function ProductModal({ product, onClose, isFavorite, onToggleFavorite }) {
   if (!product) return null;
   const views = product.views;
   const view = views[viewIndex];
+
+  const handleInterestedSubmit = (e) => {
+    e.preventDefault();
+    if (!emailInput) return;
+    fetch(`${API_URL}/api/interest`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: emailInput,
+        size: selectedSize,
+        channel,
+        price: product.price,
+        productId: product.id
+      })
+    }).catch(err => console.error("Error saving lead:", err));
+    setInterestedSubmitted(true);
+  };
+
+  const handleFeedbackSubmit = (e) => {
+    e.preventDefault();
+    fetch(`${API_URL}/api/feedback`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        reason: `${reason}${notes ? ` - ${notes}` : ""}`,
+        productId: product.id
+      })
+    }).catch(err => console.error("Error saving feedback:", err));
+    setFeedbackSubmitted(true);
+  };
+
+  const copyDiscount = () => {
+    navigator.clipboard.writeText("STHREE-VIP-15");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -239,14 +294,116 @@ function ProductModal({ product, onClose, isFavorite, onToggleFavorite }) {
             Inspected under Vixara's three-point standard: material verification, label and hardware cross-check,
             and a documented chain of custody. Ships with a numbered authentication card.
           </p>
-          <button className={`btn-ghost small ${isFavorite ? "active-favorite" : ""}`} style={{ width: "100%", justifyContent: "center", marginBottom: 12 }} onClick={() => onToggleFavorite(product)}>
+
+          <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
+            <button className="btn-primary" style={{ flex: 1, justifyContent: "center" }} onClick={() => setInterestedOpen(true)}>
+              <MessageSquare size={14} /> Interested • VIP Perks
+            </button>
+            <button className="btn-ghost" style={{ flex: 1, justifyContent: "center" }} onClick={() => setNotInterestedOpen(true)}>
+              <ThumbsDown size={14} /> Pass
+            </button>
+          </div>
+
+          <button className={`btn-ghost small ${isFavorite ? "active-favorite" : ""}`} style={{ width: "100%", justifyContent: "center" }} onClick={() => onToggleFavorite(product)}>
             <Heart size={14} strokeWidth={1.8} fill={isFavorite ? "currentColor" : "none"} /> {isFavorite ? "Saved to Favorites" : "Add to Favorites"}
-          </button>
-          <button className="btn-primary" style={{ width: "100%", justifyContent: "center" }}>
-            Reserve This Piece <ArrowRight size={15} />
           </button>
         </div>
       </div>
+
+      {/* Interested Modal */}
+      {interestedOpen && (
+        <div className="modal-backdrop" onClick={() => setInterestedOpen(false)} style={{ zIndex: 1100 }}>
+          <div className="modal-card-custom" onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setInterestedOpen(false)}><X size={18} /></button>
+            {!interestedSubmitted ? (
+              <form onSubmit={handleInterestedSubmit}>
+                <div className="chat-modal-head">
+                  <h3 className="display">STHREE VIP Concierge</h3>
+                  <p>Reserve size &amp; unlock an exclusive 15% VIP Launch discount.</p>
+                </div>
+                <div className="form-group-custom">
+                  <label>Select Size</label>
+                  <div className="chip-row">
+                    {["S", "M", "L", "XL", "Free Size"].map((s) => (
+                      <button type="button" key={s} className={`chip-btn ${selectedSize === s ? "active" : ""}`} onClick={() => setSelectedSize(s)}>{s}</button>
+                    ))}
+                  </div>
+                </div>
+                <div className="form-group-custom">
+                  <label>Preferred Contact Channel</label>
+                  <div className="chip-row">
+                    {["WhatsApp", "Email", "SMS"].map((c) => (
+                      <button type="button" key={c} className={`chip-btn ${channel === c ? "active" : ""}`} onClick={() => setChannel(c)}>{c}</button>
+                    ))}
+                  </div>
+                </div>
+                <div className="form-group-custom">
+                  <label>Your Contact / Email</label>
+                  <input type="email" required placeholder="name@domain.com" value={emailInput} onChange={e => setEmailInput(e.target.value)} className="custom-input" />
+                </div>
+                <button type="submit" className="btn-primary" style={{ width: "100%", justifyContent: "center" }}>
+                  <Zap size={14} /> Unlock 15% Discount &amp; Reserve
+                </button>
+              </form>
+            ) : (
+              <div style={{ textAlign: "center", padding: "10px 0" }}>
+                <CheckCircle2 size={36} style={{ color: "var(--brass-bright)", marginBottom: 12 }} />
+                <h3 className="display" style={{ fontSize: 22 }}>Size {selectedSize} Reserved!</h3>
+                <p style={{ color: "var(--bone-dim)", fontSize: 14 }}>Contact recorded via {channel}.</p>
+                <div className="discount-reward-box" style={{ marginTop: 16 }}>
+                  <span className="reward-label">EXCLUSIVE VIP CODE</span>
+                  <div className="discount-code-badge">
+                    <span>STHREE-VIP-15</span>
+                    <button type="button" className="copy-btn" onClick={copyDiscount}>
+                      {copied ? "COPIED!" : <Copy size={14} />}
+                    </button>
+                  </div>
+                </div>
+                <button className="btn-ghost" style={{ marginTop: 20, width: "100%" }} onClick={() => setInterestedOpen(false)}>Close</button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Not Interested Feedback Modal */}
+      {notInterestedOpen && (
+        <div className="modal-backdrop" onClick={() => setNotInterestedOpen(false)} style={{ zIndex: 1100 }}>
+          <div className="modal-card-custom" onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setNotInterestedOpen(false)}><X size={18} /></button>
+            {!feedbackSubmitted ? (
+              <form onSubmit={handleFeedbackSubmit}>
+                <div className="chat-modal-head">
+                  <h3 className="display">Product Feedback</h3>
+                  <p>Help us curate pieces tailored to your exact taste.</p>
+                </div>
+                <div className="form-group-custom">
+                  <label>Reason for passing</label>
+                  <div className="chip-row vertical">
+                    {["Price point too high", "Size unavailable", "Not my personal style", "Looking for another brand"].map((r) => (
+                      <button type="button" key={r} className={`chip-btn full ${reason === r ? "active" : ""}`} onClick={() => setReason(r)}>{r}</button>
+                    ))}
+                  </div>
+                </div>
+                <div className="form-group-custom">
+                  <label>Notes (Optional)</label>
+                  <textarea rows={2} placeholder="What style or fabric are you looking for?" value={notes} onChange={e => setNotes(e.target.value)} className="custom-input" />
+                </div>
+                <button type="submit" className="btn-primary" style={{ width: "100%", justifyContent: "center" }}>
+                  Submit Feedback
+                </button>
+              </form>
+            ) : (
+              <div style={{ textAlign: "center", padding: "10px 0" }}>
+                <CheckCircle2 size={36} style={{ color: "var(--brass-bright)", marginBottom: 12 }} />
+                <h3 className="display" style={{ fontSize: 22 }}>Feedback Received</h3>
+                <p style={{ color: "var(--bone-dim)", fontSize: 14 }}>Thank you for helping us curate our collection.</p>
+                <button className="btn-ghost" style={{ marginTop: 20, width: "100%" }} onClick={() => setNotInterestedOpen(false)}>Close</button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
