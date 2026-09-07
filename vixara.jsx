@@ -405,8 +405,6 @@ export default function VixaraSite() {
         </div>
       </div>
 
-      <ShopifyCustomSection />
-
       <section className="section" id="collection">
         <div className="wrap">
           <Reveal className="section-head">
