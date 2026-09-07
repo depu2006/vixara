@@ -213,6 +213,13 @@ app.post('/api/interest', (req, res) => {
   const { contact, email, size, commsPreference } = req.body;
   const contactValue = contact || email;
   if (!contactValue) return res.status(400).json({ error: 'Contact information is required' });
+  const isEmail = commsPreference === 'Email';
+  const contactIsValid = isEmail
+    ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactValue)
+    : /^[+\d][\d\s().-]{7,}$/.test(contactValue);
+  if (!contactIsValid) {
+    return res.status(400).json({ error: isEmail ? 'A valid email address is required' : 'A valid mobile number is required' });
+  }
   
   db.run('INSERT INTO Leads (email, size, comms_preference) VALUES (?, ?, ?)', [contactValue, size, commsPreference], function(err) {
     if (err) return res.status(500).json({ error: err.message });

@@ -68,6 +68,11 @@ export default function CollectionPage() {
   const handleInterestedSubmit = (e) => {
     e.preventDefault();
     if (!contactInput) return;
+    const isEmail = channel === "Email";
+    const contactIsValid = isEmail
+      ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactInput)
+      : /^[+\d][\d\s().-]{7,}$/.test(contactInput);
+    if (!contactIsValid) return;
     fetch(`${API_URL}/api/interest`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -251,6 +256,7 @@ export default function CollectionPage() {
                       <input
                         type={channel === "Email" ? "email" : "tel"}
                         inputMode={channel === "Email" ? "email" : "tel"}
+                        pattern={channel === "Email" ? "[^\\s@]+@[^\\s@]+\\.[^\\s@]+" : "[+\\d][\\d\\s().-]{7,}"}
                         required
                         placeholder={channel === "Email" ? "name@domain.com" : "+91 98765 43210"}
                         value={contactInput}
