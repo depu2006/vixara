@@ -11,6 +11,13 @@ const API_URL = import.meta.env.VITE_API_URL || "https://vixara-backend.onrender
    until real per-SKU editorial photography exists. */
 const STYLED_SHOT = "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=900&q=70";
 
+const INDIAN_WEAR_TYPES = [
+  "Saree", "Ghagra Choli", "Anarkali Suit", "Indo-Western Suit",
+  "Salwar Suit", "Kurta & Churidar", "Sharara Suit", "Gharara Suit",
+  "Women's Sherwani", "Indian Gown", "Lancha", "Dhoti Kurta",
+  "Temple Jhumkas", "Embroidered Potlis"
+];
+
 /* ---------------------------------------------------------
    DATA — swap this for a real API / CMS call later.
    Keeping it as one typed array is what makes the grid,
@@ -401,7 +408,7 @@ export default function VixaraSite() {
 
       <div className="marquee-section">
         <div className="marquee-track">
-          {[...brands, ...brands, ...brands].map((b, i) => <span key={i}>{b}</span>)}
+          {[...INDIAN_WEAR_TYPES, ...INDIAN_WEAR_TYPES].map((b, i) => <span key={i}>{b}</span>)}
         </div>
       </div>
 
