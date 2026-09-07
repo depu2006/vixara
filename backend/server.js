@@ -216,7 +216,7 @@ app.post('/api/interest', (req, res) => {
   const isEmail = commsPreference === 'Email';
   const contactIsValid = isEmail
     ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactValue)
-    : /^[+\d][\d\s().-]{7,}$/.test(contactValue);
+    : /^\d{10,15}$/.test(contactValue);
   if (!contactIsValid) {
     return res.status(400).json({ error: isEmail ? 'A valid email address is required' : 'A valid mobile number is required' });
   }
