@@ -149,8 +149,8 @@ export default function Admin() {
           <h2 className="display" style={{ marginBottom: '24px', textAlign: 'center' }}>Admin Access</h2>
           {error && <p style={{ color: '#ff4444', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}><AlertCircle size={16}/> {error}</p>}
           <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <input className="filter-btn" type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required />
-            <input className="filter-btn" type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
+            <input className="filter-btn" type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} autoCapitalize="none" autoCorrect="off" spellCheck="false" required />
+            <input className="filter-btn" type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} autoCapitalize="none" autoCorrect="off" spellCheck="false" required />
             <button className="btn-primary" type="submit" style={{ justifyContent: 'center' }}>Sign In</button>
           </form>
         </div>
