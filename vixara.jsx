@@ -2,10 +2,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import {
   ShieldCheck, Menu, X, ArrowRight, ChevronLeft, ChevronRight,
-  Upload, RefreshCw, Shirt, Sparkles, Trash2, Heart, MessageSquare,
-  ThumbsDown, CheckCircle2, Copy, Rocket, Sliders, Zap, Tag
+  Upload, RefreshCw, Shirt, Sparkles, Trash2, Heart
 } from "lucide-react";
-import { launchProductWithPrice, registerCustomerInterestLead, calculateLaunchPricing } from "./backend/shopify-backend-launch.js";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -282,21 +280,14 @@ function FavoritesDrawer({ open, onClose, favorites, onToggleFavorite }) {
 }
 
 function ShopifyCustomSection() {
-  const [priceInput, setPriceInput] = useState(3240);
   const [activePrice, setActivePrice] = useState(3240);
   const [discountPercent, setDiscountPercent] = useState(15);
-  const [launchModalOpen, setLaunchModalOpen] = useState(false);
-  const [launchResult, setLaunchResult] = useState(null);
-
-  // Interested Drawer State
   const [interestedOpen, setInterestedOpen] = useState(false);
   const [size, setSize] = useState("M");
   const [channel, setChannel] = useState("Email");
   const [clientEmail, setClientEmail] = useState("");
   const [interestedSubmitted, setInterestedSubmitted] = useState(false);
   const [copied, setCopied] = useState(false);
-
-  // Not Interested Drawer State
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [reason, setReason] = useState("Price point too high");
   const [notes, setNotes] = useState("");
@@ -304,18 +295,6 @@ function ShopifyCustomSection() {
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
   const pricing = calculateLaunchPricing(activePrice, discountPercent);
-
-  const handleLaunch = async (e) => {
-    e.preventDefault();
-    const result = await launchProductWithPrice({
-      newPrice: priceInput,
-      discountPercent: discountPercent,
-      sku: "VX-0417"
-    });
-    setActivePrice(priceInput);
-    setLaunchResult(result);
-    setLaunchModalOpen(true);
-  };
 
   const handleInterestedSubmit = (e) => {
     e.preventDefault();
@@ -338,39 +317,6 @@ function ShopifyCustomSection() {
   return (
     <section className="shopify-section-container" id="shopify-section">
       <div className="wrap">
-        <div className="shopify-admin-bar">
-          <div className="admin-bar-title">
-            <Rocket size={18} className="accent-icon" />
-            <span><strong>Shopify One-Click Launch Engine</strong> • Dynamic Pricing &amp; Section Controller</span>
-          </div>
-          <form className="admin-bar-controls" onSubmit={handleLaunch}>
-            <label className="admin-label">
-              <span>Launch Price ($)</span>
-              <input
-                type="number"
-                value={priceInput}
-                onChange={(e) => setPriceInput(Number(e.target.value))}
-                className="admin-input"
-                min="100"
-              />
-            </label>
-            <label className="admin-label">
-              <span>VIP Discount (%)</span>
-              <input
-                type="number"
-                value={discountPercent}
-                onChange={(e) => setDiscountPercent(Number(e.target.value))}
-                className="admin-input"
-                min="1"
-                max="90"
-              />
-            </label>
-            <button type="submit" className="btn-primary admin-btn">
-              <Zap size={14} /> One-Click Launch
-            </button>
-          </form>
-        </div>
-
         <div className="section-head" style={{ border: "none", marginBottom: 24, paddingTop: 10 }}>
           <div>
             <span className="tag">Shopify Custom Section</span>
@@ -408,8 +354,8 @@ function ShopifyCustomSection() {
         </div>
       </div>
 
-      {/* Interested Modal */}
-      {interestedOpen && (
+        {/* Interested Modal */}
+        {interestedOpen && (
         <div className="modal-backdrop" onClick={() => setInterestedOpen(false)}>
           <div className="modal-card-custom" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close" onClick={() => setInterestedOpen(false)}><X size={18} /></button>
@@ -565,27 +511,6 @@ function ShopifyCustomSection() {
         </div>
       )}
 
-      {/* Admin Launch Payload Modal */}
-      {launchModalOpen && launchResult && (
-        <div className="modal-backdrop" onClick={() => setLaunchModalOpen(false)}>
-          <div className="modal-card-custom wide" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={() => setLaunchModalOpen(false)}><X size={18} /></button>
-            <div className="chat-modal-head">
-              <h3 className="display" style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <Rocket size={22} className="accent-icon" /> Shopify GraphQL Launch Dispatched
-              </h3>
-              <p>{launchResult.message}</p>
-            </div>
-            <div className="payload-box">
-              <div className="payload-title"><Sliders size={14} /> Shopify Admin GraphQL Payload Sent</div>
-              <pre>{JSON.stringify(launchResult.variables, null, 2)}</pre>
-            </div>
-            <button className="btn-primary" style={{ width: "100%", justifyContent: "center", marginTop: 16 }} onClick={() => setLaunchModalOpen(false)}>
-              Close &amp; View Updated Section
-            </button>
-          </div>
-        </div>
-      )}
     </section>
   );
 }
@@ -668,7 +593,6 @@ export default function VixaraSite() {
             <li><a href="#collection" onClick={(e) => scrollToSection('#collection', e)}>Collection</a></li>
             <li><a href="#manifesto" onClick={(e) => scrollToSection('#manifesto', e)}>Provenance</a></li>
             <li><a href="#membership" onClick={(e) => scrollToSection('#membership', e)}>Access</a></li>
-            <li><Link to="/admin">Admin</Link></li>
           </ul></nav>
           <a href="#membership" className="nav-cta" onClick={(e) => scrollToSection('#membership', e)}>Request Access</a>
         </div>
@@ -689,7 +613,6 @@ export default function VixaraSite() {
             <a href="#collection" onClick={(e) => scrollToSection('#collection', e)}>Collection</a>
             <a href="#manifesto" onClick={(e) => scrollToSection('#manifesto', e)}>Provenance</a>
             <a href="#membership" onClick={(e) => scrollToSection('#membership', e)}>Access</a>
-            <Link to="/admin" onClick={() => setMenuOpen(false)}>Admin</Link>
           </nav>
         </div>
       )}
@@ -716,6 +639,8 @@ export default function VixaraSite() {
           {[...brands, ...brands, ...brands].map((b, i) => <span key={i}>{b}</span>)}
         </div>
       </div>
+
+      <ShopifyCustomSection />
 
       <section className="section" id="collection">
         <div className="wrap">

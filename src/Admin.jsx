@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Package, Plus, Edit2, Trash2, LogOut, CheckCircle, AlertCircle, Users, MessageSquare } from 'lucide-react';
+import { Rocket, Sliders, Zap } from 'lucide-react';
+import { launchProductWithPrice, calculateLaunchPricing } from '../backend/shopify-backend-launch.js';
 import './index.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -11,6 +13,9 @@ export default function Admin() {
   const [error, setError] = useState('');
   
   const [activeTab, setActiveTab] = useState('products');
+  const [priceInput, setPriceInput] = useState(3240);
+  const [discountPercent, setDiscountPercent] = useState(15);
+  const [launchResult, setLaunchResult] = useState(null);
   
   const [products, setProducts] = useState([]);
   const [leads, setLeads] = useState([]);
@@ -127,6 +132,16 @@ export default function Admin() {
     setShowForm(true);
   };
 
+  const handleLaunch = async (e) => {
+    e.preventDefault();
+    const result = await launchProductWithPrice({
+      newPrice: priceInput,
+      discountPercent,
+      sku: 'VX-0417'
+    });
+    setLaunchResult(result);
+  };
+
   if (!token) {
     return (
       <div className="vx-root admin-login" style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -165,7 +180,43 @@ export default function Admin() {
           <button className={`filter-btn ${activeTab === 'feedback' ? 'active' : ''}`} onClick={() => setActiveTab('feedback')} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <MessageSquare size={14} /> Feedback
           </button>
+          <button className={`filter-btn ${activeTab === 'launch' ? 'active' : ''}`} onClick={() => setActiveTab('launch')} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <Rocket size={14} /> Launch
+          </button>
         </div>
+
+        {activeTab === 'launch' && (
+          <section className="admin-launch-panel">
+            <div className="admin-section-toolbar">
+              <div>
+                <h3 className="display" style={{ fontSize: '24px', margin: 0 }}>Shopify One-Click Launch Engine</h3>
+                <p style={{ color: 'var(--bone-dim)', fontSize: '14px', marginTop: '8px' }}>Dynamic pricing and section controller.</p>
+              </div>
+              <Rocket className="accent-icon" size={30} />
+            </div>
+            <form className="admin-launch-form" onSubmit={handleLaunch}>
+              <label className="admin-label">Launch Price ($)
+                <input className="admin-input" type="number" min="100" value={priceInput} onChange={(e) => setPriceInput(Number(e.target.value))} />
+              </label>
+              <label className="admin-label">VIP Discount (%)
+                <input className="admin-input" type="number" min="1" max="90" value={discountPercent} onChange={(e) => setDiscountPercent(Number(e.target.value))} />
+              </label>
+              <button type="submit" className="btn-primary"><Zap size={14} /> One-Click Launch</button>
+            </form>
+            <div className="admin-launch-preview">
+              <span>Reserved price</span>
+              <strong>${calculateLaunchPricing(priceInput, discountPercent).finalPrice.toLocaleString()}</strong>
+              <span>{discountPercent}% VIP discount</span>
+            </div>
+            {launchResult && (
+              <div className="payload-box">
+                <div className="payload-title"><Sliders size={14} /> Shopify Admin GraphQL Payload Sent</div>
+                <p>{launchResult.message}</p>
+                <pre>{JSON.stringify(launchResult.variables, null, 2)}</pre>
+              </div>
+            )}
+          </section>
+        )}
 
         {activeTab === 'products' && (
           <>

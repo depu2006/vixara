@@ -74,19 +74,47 @@ db.serialize(() => {
   db.get('SELECT COUNT(*) as count FROM Products', (err, row) => {
     if (!err && row.count === 0) {
       const mockProducts = [
-        { id: "VX-0417", brand: "Loro Piana", name: "Cashmere Overcoat", price: 3240, size: "M", category: "Outerwear", img: "https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?auto=format&fit=crop&w=800&q=60" },
-        { id: "VX-0552", brand: "Margiela", name: "Deconstructed Blazer", price: 1890, size: "48", category: "Tailoring", img: "https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?auto=format&fit=crop&w=800&q=60" },
-        { id: "VX-0603", brand: "Bottega Veneta", name: "Intrecciato Jacket", price: 2410, size: "L", category: "Outerwear", img: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=800&q=60" },
-        { id: "VX-0689", brand: "Brunello Cucinelli", name: "Wool Knit Sweater", price: 1120, size: "S", category: "Knitwear", img: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=800&q=60" },
-        { id: "VX-0714", brand: "Saint Laurent", name: "Silk Shirt", price: 980, size: "40", category: "Tailoring", img: "https://images.unsplash.com/photo-1503341504253-dff4815485f1?auto=format&fit=crop&w=800&q=60" },
-        { id: "VX-0771", brand: "Balenciaga", name: "Tailored Trousers", price: 1340, size: "32", category: "Tailoring", img: "https://images.unsplash.com/photo-1516826957135-700dedea698c?auto=format&fit=crop&w=800&q=60" },
+        // Kurtis
+        { id: "VX-1001", brand: "Vixara", name: "Anarkali Kurti – Rose Gold Thread", price: 1899, size: "M", category: "Kurtis", img: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=60" },
+        { id: "VX-1002", brand: "Vixara", name: "Chikankari White Cotton Kurti", price: 1499, size: "S", category: "Kurtis", img: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=60" },
+        { id: "VX-1003", brand: "Vixara", name: "Ajrakh Print A-Line Kurti", price: 1299, size: "L", category: "Kurtis", img: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=800&q=60" },
+        { id: "VX-1004", brand: "Vixara", name: "Silk Blend Straight Kurti – Teal", price: 1699, size: "XL", category: "Kurtis", img: "https://images.unsplash.com/photo-1614252369475-531eba835eb1?auto=format&fit=crop&w=800&q=60" },
+
+        // Sarees
+        { id: "VX-2001", brand: "Vixara", name: "Banarasi Silk Saree – Maroon", price: 4999, size: "Free", category: "Sarees", img: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=60" },
+        { id: "VX-2002", brand: "Vixara", name: "Kanjivaram Pure Silk – Royal Blue", price: 6499, size: "Free", category: "Sarees", img: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=60" },
+        { id: "VX-2003", brand: "Vixara", name: "Linen Handloom Saree – Olive", price: 2999, size: "Free", category: "Sarees", img: "https://images.unsplash.com/photo-1614252369475-531eba835eb1?auto=format&fit=crop&w=800&q=60" },
+        { id: "VX-2004", brand: "Vixara", name: "Georgette Party Saree – Blush Pink", price: 3499, size: "Free", category: "Sarees", img: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=800&q=60" },
+
+        // Lehengas
+        { id: "VX-3001", brand: "Vixara", name: "Bridal Lehenga – Heavy Embroidery", price: 12999, size: "M", category: "Lehengas", img: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=800&q=60" },
+        { id: "VX-3002", brand: "Vixara", name: "Pastel Mirror Work Lehenga", price: 8999, size: "S", category: "Lehengas", img: "https://images.unsplash.com/photo-1585487000160-6ebcfceb0d44?auto=format&fit=crop&w=800&q=60" },
+        { id: "VX-3003", brand: "Vixara", name: "Floral Print Lehenga – Sangeet", price: 5999, size: "L", category: "Lehengas", img: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=60" },
+
+        // Jhumkas & Jewellery
+        { id: "VX-4001", brand: "Vixara", name: "Temple Gold Jhumka Earrings", price: 899, size: "Free", category: "Jhumkas", img: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=800&q=60" },
+        { id: "VX-4002", brand: "Vixara", name: "Oxidised Silver Chandbali", price: 699, size: "Free", category: "Jhumkas", img: "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=800&q=60" },
+        { id: "VX-4003", brand: "Vixara", name: "Kundan Pearl Drop Jhumka", price: 1199, size: "Free", category: "Jhumkas", img: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=800&q=60" },
+        { id: "VX-4004", brand: "Vixara", name: "Meenakari Lotus Jhumka – Pink", price: 999, size: "Free", category: "Jhumkas", img: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=800&q=60" },
+
+        // Handbags
+        { id: "VX-5001", brand: "Vixara", name: "Embroidered Potli Bag – Gold", price: 1599, size: "Free", category: "Handbags", img: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=60" },
+        { id: "VX-5002", brand: "Vixara", name: "Woven Jute Tote – Natural", price: 999, size: "Free", category: "Handbags", img: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=800&q=60" },
+        { id: "VX-5003", brand: "Vixara", name: "Leather Sling Bag – Tan", price: 2199, size: "Free", category: "Handbags", img: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=800&q=60" },
+        { id: "VX-5004", brand: "Vixara", name: "Beaded Clutch – Midnight", price: 1299, size: "Free", category: "Handbags", img: "https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?auto=format&fit=crop&w=800&q=60" },
+
+        // Casual Wear
+        { id: "VX-6001", brand: "Vixara", name: "Wide-Leg Palazzo Set – Ivory", price: 1799, size: "M", category: "Casual", img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=60" },
+        { id: "VX-6002", brand: "Vixara", name: "Crop Top & Skirt Co-ord – Mustard", price: 1599, size: "S", category: "Casual", img: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=800&q=60" },
+        { id: "VX-6003", brand: "Vixara", name: "Denim Jacket – Embroidered", price: 2499, size: "L", category: "Casual", img: "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=800&q=60" },
+        { id: "VX-6004", brand: "Vixara", name: "Boho Maxi Dress – Indigo Block", price: 1999, size: "M", category: "Casual", img: "https://images.unsplash.com/photo-1502716119720-b23a1e3e4bf0?auto=format&fit=crop&w=800&q=60" },
       ];
       const stmt = db.prepare('INSERT INTO Products (id, brand, name, price, size, category, img) VALUES (?, ?, ?, ?, ?, ?, ?)');
       mockProducts.forEach(p => {
         stmt.run(p.id, p.brand, p.name, p.price, p.size, p.category, p.img);
       });
       stmt.finalize();
-      console.log('Inserted mock products.');
+      console.log('Inserted 24 women\'s fashion products.');
     }
   });
 });
@@ -161,6 +189,22 @@ app.delete('/api/products/:id', authenticateToken, (req, res) => {
   db.run('DELETE FROM Products WHERE id = ?', [id], function (err) {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ deleted: true });
+  });
+});
+
+// Admin get leads
+app.get('/api/leads', authenticateToken, (req, res) => {
+  db.all('SELECT * FROM Leads ORDER BY created_at DESC', [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
+
+// Admin get feedback
+app.get('/api/feedback', authenticateToken, (req, res) => {
+  db.all('SELECT * FROM Feedback ORDER BY created_at DESC', [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
   });
 });
 
