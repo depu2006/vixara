@@ -11,7 +11,8 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 const JWT_SECRET = process.env.JWT_SECRET || 'vixara_secret_key_change_in_prod';
 
@@ -40,6 +41,7 @@ db.serialize(() => {
       size TEXT,
       category TEXT,
       img TEXT,
+      images TEXT,
       status TEXT DEFAULT 'Available',
       drop_date TEXT
     )
@@ -48,6 +50,7 @@ db.serialize(() => {
   // Safe migration for existing DB instances
   db.run(`ALTER TABLE Products ADD COLUMN status TEXT DEFAULT 'Available'`, () => {});
   db.run(`ALTER TABLE Products ADD COLUMN drop_date TEXT`, () => {});
+  db.run(`ALTER TABLE Products ADD COLUMN images TEXT`, () => {});
 
   db.run(`
     CREATE TABLE IF NOT EXISTS Leads (
@@ -158,38 +161,61 @@ app.post('/api/login', (req, res) => {
 app.get('/api/products', (req, res) => {
   db.all('SELECT * FROM Products', [], (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
-    const formatted = rows.map(r => ({
-      ...r,
-      status: r.status || 'Available',
-      drop_date: r.drop_date || ''
-    }));
+    const formatted = rows.map(r => {
+      let imagesList = [];
+      try {
+        if (r.images) {
+          imagesList = typeof r.images === 'string' ? JSON.parse(r.images) : r.images;
+        }
+      } catch (e) {
+        imagesList = [];
+      }
+      if (!Array.isArray(imagesList) || imagesList.length === 0) {
+        imagesList = r.img ? [r.img] : [];
+      }
+      return {
+        ...r,
+        images: imagesList,
+        img: r.img || imagesList[0] || '',
+        status: r.status || 'Available',
+        drop_date: r.drop_date || ''
+      };
+    });
     res.json(formatted);
   });
 });
 
 // Add Product
 app.post('/api/products', authenticateToken, (req, res) => {
-  const { id, brand, name, price, size, category, img, status = 'Available', drop_date = '' } = req.body;
+  const { id, brand, name, price, size, category, img, images, status = 'Available', drop_date = '' } = req.body;
+  const imagesArr = Array.isArray(images) && images.length > 0 ? images : (img ? [img] : []);
+  const primaryImg = img || (imagesArr.length > 0 ? imagesArr[0] : '');
+  const imagesJson = JSON.stringify(imagesArr);
+
   db.run(
-    'INSERT INTO Products (id, brand, name, price, size, category, img, status, drop_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-    [id, brand, name, price, size, category, img, status, drop_date],
+    'INSERT INTO Products (id, brand, name, price, size, category, img, images, status, drop_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    [id, brand, name, price, size, category, primaryImg, imagesJson, status, drop_date],
     function (err) {
       if (err) return res.status(500).json({ error: err.message });
-      res.json({ id, brand, name, price, size, category, img, status, drop_date });
+      res.json({ id, brand, name, price, size, category, img: primaryImg, images: imagesArr, status, drop_date });
     }
   );
 });
 
 // Update Product
 app.put('/api/products/:id', authenticateToken, (req, res) => {
-  const { brand, name, price, size, category, img, status = 'Available', drop_date = '' } = req.body;
+  const { brand, name, price, size, category, img, images, status = 'Available', drop_date = '' } = req.body;
   const id = req.params.id;
+  const imagesArr = Array.isArray(images) && images.length > 0 ? images : (img ? [img] : []);
+  const primaryImg = img || (imagesArr.length > 0 ? imagesArr[0] : '');
+  const imagesJson = JSON.stringify(imagesArr);
+
   db.run(
-    'UPDATE Products SET brand = ?, name = ?, price = ?, size = ?, category = ?, img = ?, status = ?, drop_date = ? WHERE id = ?',
-    [brand, name, price, size, category, img, status, drop_date, id],
+    'UPDATE Products SET brand = ?, name = ?, price = ?, size = ?, category = ?, img = ?, images = ?, status = ?, drop_date = ? WHERE id = ?',
+    [brand, name, price, size, category, primaryImg, imagesJson, status, drop_date, id],
     function (err) {
       if (err) return res.status(500).json({ error: err.message });
-      res.json({ id, brand, name, price, size, category, img, status, drop_date });
+      res.json({ id, brand, name, price, size, category, img: primaryImg, images: imagesArr, status, drop_date });
     }
   );
 });

@@ -740,14 +740,28 @@ export default function VixaraSite() {
     fetch(`${API_URL}/api/products`)
       .then(res => res.json())
       .then(data => {
-        const withViews = data.map(p => ({
-          ...p,
-          views: [
-            { label: "Front", img: p.img, zoom: false },
-            { label: "Detail", img: p.img, zoom: true },
-            { label: "Styled", img: STYLED_SHOT, zoom: false },
-          ]
-        }));
+        const withViews = data.map(p => {
+          const mainImg = p.img || (p.images && p.images[0]) || "";
+          let viewsList = [];
+          if (Array.isArray(p.images) && p.images.length > 1) {
+            viewsList = p.images.map((imgSrc, idx) => ({
+              label: idx === 0 ? "Front" : idx === 1 ? "Angle" : idx === 2 ? "Detail" : `View ${idx + 1}`,
+              img: imgSrc,
+              zoom: idx === 2
+            }));
+          } else {
+            viewsList = [
+              { label: "Front", img: mainImg, zoom: false },
+              { label: "Detail", img: mainImg, zoom: true },
+              { label: "Styled", img: STYLED_SHOT, zoom: false },
+            ];
+          }
+          return {
+            ...p,
+            img: mainImg,
+            views: viewsList
+          };
+        });
         setProducts(withViews);
         setCategories(["All", ...new Set(withViews.map(p => p.category).filter(Boolean))]);
         setBrands([...new Set(withViews.map(p => p.brand).filter(Boolean))]);

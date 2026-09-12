@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Package, Plus, Edit2, Trash2, LogOut, CheckCircle, AlertCircle, Users, MessageSquare, Clock, Sparkles, ShieldAlert, Rocket, Sliders, Zap, Check } from 'lucide-react';
+import { Package, Plus, Edit2, Trash2, LogOut, CheckCircle, AlertCircle, Users, MessageSquare, Clock, Sparkles, ShieldAlert, Rocket, Sliders, Zap, Check, Upload, X, Image as ImageIcon } from 'lucide-react';
 import { launchProductWithPrice, calculateLaunchPricing } from '../backend/shopify-backend-launch.js';
 import './index.css';
 
@@ -24,7 +24,7 @@ export default function Admin() {
   const [isEditing, setIsEditing] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-    id: '', brand: '', name: '', price: '', size: '', category: '', img: '', status: 'Available', drop_date: ''
+    id: '', brand: '', name: '', price: '', size: '', category: '', img: '', images: [], status: 'Available', drop_date: ''
   });
 
   const fetchData = async () => {
@@ -80,8 +80,62 @@ export default function Admin() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Image Upload Handlers (JPEG / PNG / WEBP - Single or Multi)
+  const handleImageFiles = (files) => {
+    if (!files || files.length === 0) return;
+    const fileList = Array.from(files).filter(f => f.type.startsWith('image/'));
+    if (fileList.length === 0) {
+      alert('Please select JPEG or PNG image files.');
+      return;
+    }
+
+    const readers = fileList.map(file => {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.readAsDataURL(file);
+      });
+    });
+
+    Promise.all(readers).then(newImages => {
+      setFormData(prev => {
+        const updated = [...(prev.images || []), ...newImages];
+        return {
+          ...prev,
+          images: updated,
+          img: updated[0] || prev.img
+        };
+      });
+    });
+  };
+
+  const removeImage = (idxToRemove) => {
+    setFormData(prev => {
+      const updated = (prev.images || []).filter((_, idx) => idx !== idxToRemove);
+      return {
+        ...prev,
+        images: updated,
+        img: updated[0] || ''
+      };
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if ((!formData.images || formData.images.length === 0) && !formData.img) {
+      alert('Please upload at least one JPEG or PNG image for this product.');
+      return;
+    }
+
+    const primaryImg = (formData.images && formData.images.length > 0) ? formData.images[0] : formData.img;
+    const imagesArray = (formData.images && formData.images.length > 0) ? formData.images : (primaryImg ? [primaryImg] : []);
+    
+    const payload = {
+      ...formData,
+      img: primaryImg,
+      images: imagesArray
+    };
+
     const url = isEditing ? `${API_URL}/api/products/${formData.id}` : `${API_URL}/api/products`;
     const method = isEditing ? 'PUT' : 'POST';
     
@@ -92,7 +146,7 @@ export default function Admin() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
       
       if (res.ok) {
@@ -107,6 +161,10 @@ export default function Admin() {
   };
 
   const handleEdit = (product) => {
+    const imgList = Array.isArray(product.images) && product.images.length > 0
+      ? product.images
+      : (product.img ? [product.img] : []);
+
     setFormData({
       id: product.id,
       brand: product.brand,
@@ -114,7 +172,8 @@ export default function Admin() {
       price: product.price,
       size: product.size || 'Free',
       category: product.category || 'General',
-      img: product.img,
+      img: product.img || imgList[0] || '',
+      images: imgList,
       status: product.status || 'Available',
       drop_date: product.drop_date || ''
     });
@@ -144,6 +203,7 @@ export default function Admin() {
       size: 'M',
       category: 'Sarees',
       img: '',
+      images: [],
       status: initialStatus,
       drop_date: initialStatus === 'Coming Soon' ? 'Next Capsule Drop' : ''
     });
@@ -510,7 +570,64 @@ export default function Admin() {
               <label className="admin-label">Price ($) <input className="filter-btn" type="number" style={{ width: '100%', marginTop: '6px' }} name="price" value={formData.price} onChange={handleChange} required /></label>
               <label className="admin-label">Size <input className="filter-btn" style={{ width: '100%', marginTop: '6px' }} name="size" value={formData.size} onChange={handleChange} required /></label>
               <label className="admin-label">Category <input className="filter-btn" style={{ width: '100%', marginTop: '6px' }} name="category" value={formData.category} onChange={handleChange} required /></label>
-              <label className="admin-label">Image URL <input className="filter-btn" style={{ width: '100%', marginTop: '6px' }} name="img" value={formData.img} onChange={handleChange} required /></label>
+              {/* Image Upload Zone & Previews (JPEG/PNG, single or multiple) */}
+              <div className="form-group-custom">
+                <label style={{ fontSize: '12px', color: 'var(--brass-bright)', fontWeight: 600, display: 'block', marginBottom: '6px' }}>
+                  Product Images (Upload JPEG or PNG · 1 or Multiple Angles)
+                </label>
+                <div 
+                  className="admin-image-upload-zone"
+                  onClick={() => document.getElementById('admin-file-input').click()}
+                  onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (e.dataTransfer.files) handleImageFiles(e.dataTransfer.files);
+                  }}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <Upload size={24} style={{ color: 'var(--brass-bright)' }} />
+                  <strong style={{ fontSize: '13px', color: 'var(--bone)' }}>Click or Drag &amp; Drop JPEG / PNG Images</strong>
+                  <span>Supports single photo or multiple gallery angles (Front, Side, Detail)</span>
+                  <input
+                    id="admin-file-input"
+                    type="file"
+                    accept="image/jpeg,image/png,image/jpg,image/webp"
+                    multiple
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      if (e.target.files) handleImageFiles(e.target.files);
+                      e.target.value = '';
+                    }}
+                  />
+                </div>
+
+                {formData.images && formData.images.length > 0 && (
+                  <div style={{ marginTop: '12px' }}>
+                    <div style={{ fontSize: '11px', color: 'var(--bone-dim)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                      Uploaded Angles ({formData.images.length}) · First photo is main cover
+                    </div>
+                    <div className="admin-thumbs-grid">
+                      {formData.images.map((src, idx) => (
+                        <div key={idx} className="admin-thumb-card">
+                          <img src={src} alt={`Angle ${idx + 1}`} />
+                          <button
+                            type="button"
+                            className="admin-thumb-remove"
+                            onClick={(e) => { e.stopPropagation(); removeImage(idx); }}
+                            title="Remove image"
+                          >
+                            <X size={12} />
+                          </button>
+                          <div className="admin-thumb-label">
+                            {idx === 0 ? 'Primary' : `Angle ${idx + 1}`}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
               
               <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
                 <button type="submit" className="btn-primary" style={{ flex: 1, justifyContent: 'center' }}><CheckCircle size={16}/> Save Item</button>
