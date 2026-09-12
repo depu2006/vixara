@@ -302,7 +302,6 @@ export default function CollectionPage() {
             <ul>
               <li><Link to="/">Home</Link></li>
               <li><Link to="/collection" style={{ color: "var(--brass-bright)" }}>Collection</Link></li>
-              <li><Link to="/admin">Admin</Link></li>
             </ul>
           </nav>
         </div>
@@ -322,7 +321,6 @@ export default function CollectionPage() {
           <nav style={{ display: "flex", flexDirection: "column", gap: 28, fontSize: 20, fontFamily: "'Fraunces',serif" }}>
             <Link to="/" onClick={() => setMenuOpen(false)}>Home</Link>
             <Link to="/collection" onClick={() => setMenuOpen(false)} style={{ color: "var(--brass-bright)" }}>Collection</Link>
-            <Link to="/admin" onClick={() => setMenuOpen(false)}>Admin</Link>
           </nav>
         </div>
       )}

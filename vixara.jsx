@@ -807,7 +807,6 @@ export default function VixaraSite() {
             <li><Link to="/collection">Collection</Link></li>
             <li><a href="#manifesto" onClick={(e) => scrollToSection('#manifesto', e)}>Provenance</a></li>
             <li><a href="#membership" onClick={(e) => scrollToSection('#membership', e)}>Access</a></li>
-            <li><Link to="/admin">Admin</Link></li>
           </ul></nav>
           <Link to="/collection" className="nav-cta">Explore Collection</Link>
         </div>
@@ -828,7 +827,6 @@ export default function VixaraSite() {
             <Link to="/collection" onClick={() => setMenuOpen(false)}>Collection</Link>
             <a href="#manifesto" onClick={(e) => scrollToSection('#manifesto', e)}>Provenance</a>
             <a href="#membership" onClick={(e) => scrollToSection('#membership', e)}>Access</a>
-            <Link to="/admin" onClick={() => setMenuOpen(false)}>Admin</Link>
           </nav>
         </div>
       )}
