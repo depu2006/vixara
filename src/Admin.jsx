@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Package, Plus, Edit2, Trash2, LogOut, CheckCircle, AlertCircle, Users, MessageSquare } from 'lucide-react';
-import { Rocket, Sliders, Zap } from 'lucide-react';
+import { Package, Plus, Edit2, Trash2, LogOut, CheckCircle, AlertCircle, Users, MessageSquare, Clock, Sparkles, ShieldAlert, Rocket, Sliders, Zap, Check } from 'lucide-react';
 import { launchProductWithPrice, calculateLaunchPricing } from '../backend/shopify-backend-launch.js';
 import './index.css';
 
@@ -25,7 +24,7 @@ export default function Admin() {
   const [isEditing, setIsEditing] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-    id: '', brand: '', name: '', price: '', size: '', category: '', img: ''
+    id: '', brand: '', name: '', price: '', size: '', category: '', img: '', status: 'Available', drop_date: ''
   });
 
   const fetchData = async () => {
@@ -108,7 +107,17 @@ export default function Admin() {
   };
 
   const handleEdit = (product) => {
-    setFormData(product);
+    setFormData({
+      id: product.id,
+      brand: product.brand,
+      name: product.name,
+      price: product.price,
+      size: product.size || 'Free',
+      category: product.category || 'General',
+      img: product.img,
+      status: product.status || 'Available',
+      drop_date: product.drop_date || ''
+    });
     setIsEditing(true);
     setShowForm(true);
   };
@@ -126,10 +135,36 @@ export default function Admin() {
     }
   };
 
-  const openNewForm = () => {
-    setFormData({ id: '', brand: '', name: '', price: '', size: '', category: '', img: '' });
+  const openNewForm = (initialStatus = 'Available') => {
+    setFormData({
+      id: '',
+      brand: 'Vixara',
+      name: '',
+      price: '',
+      size: 'M',
+      category: 'Sarees',
+      img: '',
+      status: initialStatus,
+      drop_date: initialStatus === 'Coming Soon' ? 'Next Capsule Drop' : ''
+    });
     setIsEditing(false);
     setShowForm(true);
+  };
+
+  const handleQuickStatusChange = async (product, newStatus) => {
+    try {
+      await fetch(`${API_URL}/api/products/${product.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ ...product, status: newStatus })
+      });
+      fetchData();
+    } catch (err) {
+      alert('Failed to update status');
+    }
   };
 
   const handleLaunch = async (e) => {
@@ -141,6 +176,12 @@ export default function Admin() {
     });
     setLaunchResult(result);
   };
+
+  // Pipeline Counts
+  const comingSoonCount = products.filter(p => p.status === 'Coming Soon').length;
+  const restockingCount = products.filter(p => p.status === 'Coming Back').length;
+  const inStockCount = products.filter(p => !p.status || p.status === 'Available').length;
+  const outOfStockCount = products.filter(p => p.status === 'Out of Stock').length;
 
   if (!token) {
     return (
@@ -163,28 +204,163 @@ export default function Admin() {
       <div className="wrap">
         <header className="admin-header" style={{ position: 'relative', background: 'transparent', padding: '0', display: 'flex', justifyContent: 'space-between', marginBottom: '30px', border: 'none', backdropFilter: 'none' }}>
           <h2 className="display" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <Package /> Store Admin
+            <Package /> Store Admin Control Center
           </h2>
           <button className="btn-ghost" onClick={handleLogout} style={{ padding: '8px 16px' }}>
             <LogOut size={16} /> Logout
           </button>
         </header>
 
+        {/* Admin Navigation Tabs */}
         <div className="admin-tabs" style={{ display: 'flex', gap: '10px', marginBottom: '30px', borderBottom: '1px solid var(--hairline-strong)', paddingBottom: '16px' }}>
           <button className={`filter-btn ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <Package size={14} /> Catalog
+            <Package size={14} /> Catalog ({inStockCount})
+          </button>
+          <button className={`filter-btn ${activeTab === 'coming-soon' ? 'active' : ''}`} onClick={() => setActiveTab('coming-soon')} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <Clock size={14} /> Coming Soon &amp; Pipeline ({comingSoonCount + restockingCount})
           </button>
           <button className={`filter-btn ${activeTab === 'leads' ? 'active' : ''}`} onClick={() => setActiveTab('leads')} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <Users size={14} /> Leads
+            <Users size={14} /> Leads ({leads.length})
           </button>
           <button className={`filter-btn ${activeTab === 'feedback' ? 'active' : ''}`} onClick={() => setActiveTab('feedback')} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <MessageSquare size={14} /> Feedback
+            <MessageSquare size={14} /> Feedback ({feedback.length})
           </button>
           <button className={`filter-btn ${activeTab === 'launch' ? 'active' : ''}`} onClick={() => setActiveTab('launch')} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <Rocket size={14} /> Launch
+            <Rocket size={14} /> Shopify Launch Engine
           </button>
         </div>
 
+        {/* Coming Soon & Stock Pipeline Tab */}
+        {activeTab === 'coming-soon' && (
+          <section>
+            <div className="pipeline-metrics">
+              <div className="pipeline-card">
+                <span>Coming Soon Items</span>
+                <h4>{comingSoonCount}</h4>
+              </div>
+              <div className="pipeline-card">
+                <span>Restocking Capsules</span>
+                <h4 style={{ color: '#6ee7b7' }}>{restockingCount}</h4>
+              </div>
+              <div className="pipeline-card">
+                <span>Live Pre-Order Leads</span>
+                <h4 style={{ color: '#93c5fd' }}>{leads.length}</h4>
+              </div>
+              <div className="pipeline-card">
+                <span>Archived / Sold Out</span>
+                <h4 style={{ color: '#fca5a5' }}>{outOfStockCount}</h4>
+              </div>
+            </div>
+
+            <div className="admin-section-toolbar" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px', alignItems: 'center' }}>
+              <div>
+                <h3 className="display" style={{ fontSize: '24px', margin: 0 }}>Upcoming Drops &amp; Restock Pipeline</h3>
+                <p style={{ color: 'var(--bone-dim)', fontSize: '13px', margin: '4px 0 0' }}>Manage upcoming pieces shown in the User Dashboard &amp; Coming Soon Vault.</p>
+              </div>
+              <button className="btn-primary" onClick={() => openNewForm('Coming Soon')} style={{ padding: '10px 20px' }}>
+                <Plus size={16} /> Add Coming Soon Item
+              </button>
+            </div>
+
+            <div className="admin-table-wrap" style={{ background: 'var(--card)', padding: '20px', overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--hairline)', color: 'var(--bone-dim)', textTransform: 'uppercase', fontSize: '12px', letterSpacing: '0.1em' }}>
+                    <th style={{ padding: '12px' }}>Image</th>
+                    <th style={{ padding: '12px' }}>SKU</th>
+                    <th style={{ padding: '12px' }}>Name</th>
+                    <th style={{ padding: '12px' }}>Price</th>
+                    <th style={{ padding: '12px' }}>Status</th>
+                    <th style={{ padding: '12px' }}>Expected Drop Date</th>
+                    <th style={{ padding: '12px' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.filter(p => p.status === 'Coming Soon' || p.status === 'Coming Back' || p.status === 'Out of Stock').map(p => (
+                    <tr key={p.id} style={{ borderBottom: '1px solid var(--hairline-strong)' }}>
+                      <td style={{ padding: '12px' }}><img src={p.img} alt={p.name} style={{ width: '40px', height: '40px', objectFit: 'cover' }} /></td>
+                      <td style={{ padding: '12px' }} className="mono">{p.id}</td>
+                      <td style={{ padding: '12px' }}>
+                        <strong>{p.name}</strong>
+                        <div style={{ fontSize: 11, color: 'var(--bone-dim)' }}>{p.brand} · {p.category}</div>
+                      </td>
+                      <td style={{ padding: '12px' }}>${p.price}</td>
+                      <td style={{ padding: '12px' }}>
+                        <span className={`status-badge-admin ${p.status === 'Coming Soon' ? 'coming-soon' : p.status === 'Coming Back' ? 'coming-back' : 'out-of-stock'}`}>
+                          {p.status}
+                        </span>
+                      </td>
+                      <td style={{ padding: '12px', color: 'var(--brass-bright)' }}>{p.drop_date || 'TBD'}</td>
+                      <td style={{ padding: '12px', display: 'flex', gap: '8px' }}>
+                        <button className="filter-btn" title="Promote to In Stock" onClick={() => handleQuickStatusChange(p, 'Available')} style={{ padding: '6px 10px', fontSize: 11 }}>
+                          Make In Stock
+                        </button>
+                        <button className="filter-btn" onClick={() => handleEdit(p)} style={{ padding: '6px' }}><Edit2 size={14}/></button>
+                        <button className="filter-btn" onClick={() => handleDelete(p.id)} style={{ padding: '6px', color: '#ff4444' }}><Trash2 size={14}/></button>
+                      </td>
+                    </tr>
+                  ))}
+                  {products.filter(p => p.status === 'Coming Soon' || p.status === 'Coming Back' || p.status === 'Out of Stock').length === 0 && (
+                    <tr><td colSpan="7" style={{ padding: '24px', textAlign: 'center', color: 'var(--bone-dim)' }}>No upcoming pipeline pieces currently configured. Click "Add Coming Soon Item" above!</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
+
+        {/* Regular Catalog Tab */}
+        {activeTab === 'products' && (
+          <>
+            <div className="admin-section-toolbar" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
+              <div>
+                <h3 className="display" style={{ fontSize: '24px', margin: 0 }}>Product Inventory ({products.length} Items)</h3>
+                <p style={{ color: 'var(--bone-dim)', fontSize: '13px', margin: '4px 0 0' }}>Active catalog products, categories, and inventory statuses.</p>
+              </div>
+              <button className="btn-primary" onClick={() => openNewForm('Available')} style={{ padding: '10px 20px' }}>
+                <Plus size={16} /> Add Product
+              </button>
+            </div>
+            <div className="admin-table-wrap" style={{ background: 'var(--card)', padding: '20px', overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--hairline)', color: 'var(--bone-dim)', textTransform: 'uppercase', fontSize: '12px', letterSpacing: '0.1em' }}>
+                    <th style={{ padding: '12px' }}>Image</th>
+                    <th style={{ padding: '12px' }}>ID / SKU</th>
+                    <th style={{ padding: '12px' }}>Brand</th>
+                    <th style={{ padding: '12px' }}>Name</th>
+                    <th style={{ padding: '12px' }}>Price</th>
+                    <th style={{ padding: '12px' }}>Section / Status</th>
+                    <th style={{ padding: '12px' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.map(p => (
+                    <tr key={p.id} style={{ borderBottom: '1px solid var(--hairline-strong)' }}>
+                      <td style={{ padding: '12px' }}><img src={p.img} alt={p.name} style={{ width: '40px', height: '40px', objectFit: 'cover' }} /></td>
+                      <td style={{ padding: '12px' }} className="mono">{p.id}</td>
+                      <td style={{ padding: '12px' }}>{p.brand}</td>
+                      <td style={{ padding: '12px' }}>{p.name}</td>
+                      <td style={{ padding: '12px' }}>${p.price}</td>
+                      <td style={{ padding: '12px' }}>
+                        <span className={`status-badge-admin ${(!p.status || p.status === 'Available') ? 'available' : p.status === 'Coming Soon' ? 'coming-soon' : p.status === 'Coming Back' ? 'coming-back' : 'out-of-stock'}`}>
+                          {p.status || 'Available'}
+                        </span>
+                      </td>
+                      <td style={{ padding: '12px', display: 'flex', gap: '8px' }}>
+                        <button className="filter-btn" onClick={() => handleEdit(p)} style={{ padding: '6px' }}><Edit2 size={14}/></button>
+                        <button className="filter-btn" onClick={() => handleDelete(p.id)} style={{ padding: '6px', color: '#ff4444' }}><Trash2 size={14}/></button>
+                      </td>
+                    </tr>
+                  ))}
+                  {products.length === 0 && <tr><td colSpan="7" style={{ padding: '20px', textAlign: 'center', color: 'var(--bone-dim)' }}>No products found.</td></tr>}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+
+        {/* Shopify Launch Engine */}
         {activeTab === 'launch' && (
           <section className="admin-launch-panel">
             <div className="admin-section-toolbar">
@@ -218,54 +394,12 @@ export default function Admin() {
           </section>
         )}
 
-        {activeTab === 'products' && (
-          <>
-            <div className="admin-section-toolbar" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
-              <h3 className="display" style={{ fontSize: '24px', margin: 0 }}>Product Inventory</h3>
-              <button className="btn-primary" onClick={openNewForm} style={{ padding: '10px 20px' }}>
-                <Plus size={16} /> Add Product
-              </button>
-            </div>
-            <div className="admin-table-wrap" style={{ background: 'var(--card)', padding: '20px', overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid var(--hairline)', color: 'var(--bone-dim)', textTransform: 'uppercase', fontSize: '12px', letterSpacing: '0.1em' }}>
-                    <th style={{ padding: '12px' }}>Image</th>
-                    <th style={{ padding: '12px' }}>ID / SKU</th>
-                    <th style={{ padding: '12px' }}>Brand</th>
-                    <th style={{ padding: '12px' }}>Name</th>
-                    <th style={{ padding: '12px' }}>Price</th>
-                    <th style={{ padding: '12px' }}>Category</th>
-                    <th style={{ padding: '12px' }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {products.map(p => (
-                    <tr key={p.id} style={{ borderBottom: '1px solid var(--hairline-strong)' }}>
-                      <td style={{ padding: '12px' }}><img src={p.img} alt={p.name} style={{ width: '40px', height: '40px', objectFit: 'cover' }} /></td>
-                      <td style={{ padding: '12px' }} className="mono">{p.id}</td>
-                      <td style={{ padding: '12px' }}>{p.brand}</td>
-                      <td style={{ padding: '12px' }}>{p.name}</td>
-                      <td style={{ padding: '12px' }}>${p.price}</td>
-                      <td style={{ padding: '12px' }}>{p.category}</td>
-                      <td style={{ padding: '12px', display: 'flex', gap: '8px' }}>
-                        <button className="filter-btn" onClick={() => handleEdit(p)} style={{ padding: '6px' }}><Edit2 size={14}/></button>
-                        <button className="filter-btn" onClick={() => handleDelete(p.id)} style={{ padding: '6px', color: '#ff4444' }}><Trash2 size={14}/></button>
-                      </td>
-                    </tr>
-                  ))}
-                  {products.length === 0 && <tr><td colSpan="7" style={{ padding: '20px', textAlign: 'center', color: 'var(--bone-dim)' }}>No products found.</td></tr>}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
-
+        {/* Customer Leads Tab */}
         {activeTab === 'leads' && (
           <>
             <div style={{ marginBottom: '24px' }}>
-              <h3 className="display" style={{ fontSize: '24px', margin: 0 }}>Customer Leads (Waitlist)</h3>
-              <p style={{ color: 'var(--bone-dim)', fontSize: '14px', marginTop: '8px' }}>Customers who clicked "Interested" on the storefront.</p>
+              <h3 className="display" style={{ fontSize: '24px', margin: 0 }}>Customer Leads &amp; Pre-Orders ({leads.length})</h3>
+              <p style={{ color: 'var(--bone-dim)', fontSize: '14px', marginTop: '8px' }}>Customers who requested VIP access or reserved upcoming sizes on the storefront.</p>
             </div>
             <div className="admin-table-wrap" style={{ background: 'var(--card)', padding: '20px', overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
@@ -295,11 +429,12 @@ export default function Admin() {
           </>
         )}
 
+        {/* Bounce Feedback Tab */}
         {activeTab === 'feedback' && (
           <>
             <div style={{ marginBottom: '24px' }}>
-              <h3 className="display" style={{ fontSize: '24px', margin: 0 }}>Bounce Feedback</h3>
-              <p style={{ color: 'var(--bone-dim)', fontSize: '14px', marginTop: '8px' }}>Reasons customers clicked "Not Interested".</p>
+              <h3 className="display" style={{ fontSize: '24px', margin: 0 }}>Bounce Feedback ({feedback.length})</h3>
+              <p style={{ color: 'var(--bone-dim)', fontSize: '14px', marginTop: '8px' }}>Reasons customers clicked "Pass" on products.</p>
             </div>
             <div className="admin-table-wrap" style={{ background: 'var(--card)', padding: '20px', overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
@@ -326,21 +461,59 @@ export default function Admin() {
         )}
       </div>
 
-      {/* Product Form Modal */}
+      {/* Add / Edit Product Modal with Section & Status Selector */}
       {showForm && (
         <div className="modal-backdrop" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="modal-card-custom admin-modal-card" style={{ background: 'var(--card)', padding: '32px', width: '100%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' }}>
-            <h3 className="display" style={{ marginBottom: '24px' }}>{isEditing ? 'Edit Product' : 'New Product'}</h3>
+          <div className="modal-card-custom admin-modal-card" style={{ background: 'var(--card)', padding: '32px', width: '100%', maxWidth: '560px', maxHeight: '90vh', overflowY: 'auto' }}>
+            <h3 className="display" style={{ marginBottom: '20px' }}>{isEditing ? 'Edit Item' : 'Post New Item'}</h3>
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <label className="admin-label">ID / SKU (e.g. VX-0999) <input className="filter-btn" style={{ width: '100%', marginTop: '8px' }} name="id" value={formData.id} onChange={handleChange} required disabled={isEditing} /></label>
-              <label className="admin-label">Brand <input className="filter-btn" style={{ width: '100%', marginTop: '8px' }} name="brand" value={formData.brand} onChange={handleChange} required /></label>
-              <label className="admin-label">Name <input className="filter-btn" style={{ width: '100%', marginTop: '8px' }} name="name" value={formData.name} onChange={handleChange} required /></label>
-              <label className="admin-label">Price ($) <input className="filter-btn" type="number" style={{ width: '100%', marginTop: '8px' }} name="price" value={formData.price} onChange={handleChange} required /></label>
-              <label className="admin-label">Size <input className="filter-btn" style={{ width: '100%', marginTop: '8px' }} name="size" value={formData.size} onChange={handleChange} required /></label>
-              <label className="admin-label">Category <input className="filter-btn" style={{ width: '100%', marginTop: '8px' }} name="category" value={formData.category} onChange={handleChange} required /></label>
-              <label className="admin-label">Image URL <input className="filter-btn" style={{ width: '100%', marginTop: '8px' }} name="img" value={formData.img} onChange={handleChange} required /></label>
+              
+              {/* Requirement 4: Section / Status Selection */}
+              <div className="form-group-custom">
+                <label style={{ fontSize: '12px', color: 'var(--brass-bright)', fontWeight: 600 }}>Where should this item be posted?</label>
+                <div className="status-choice-grid">
+                  {[
+                    { id: 'Available', label: 'Available (Normal Catalog)', desc: 'Active stock on main storefront' },
+                    { id: 'Coming Soon', label: 'Coming Soon (Upcoming Drops)', desc: 'Visible in Coming Soon section & Vault' },
+                    { id: 'Coming Back', label: 'Coming Back (Restocking)', desc: 'Item in re-production / waitlist open' },
+                    { id: 'Out of Stock', label: 'Out of Stock (Archived)', desc: 'Marked as sold out in archives' }
+                  ].map(opt => (
+                    <div
+                      key={opt.id}
+                      className={`status-choice-card ${formData.status === opt.id ? 'selected' : ''}`}
+                      onClick={() => setFormData({ ...formData, status: opt.id })}
+                    >
+                      <strong>{opt.label}</strong>
+                      <small>{opt.desc}</small>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {(formData.status === 'Coming Soon' || formData.status === 'Coming Back') && (
+                <label className="admin-label">
+                  Expected Drop Date / Restock Note
+                  <input
+                    className="filter-btn"
+                    style={{ width: '100%', marginTop: '6px' }}
+                    name="drop_date"
+                    placeholder="e.g. Oct 25, 2026 or Restocking in 4 days"
+                    value={formData.drop_date || ''}
+                    onChange={handleChange}
+                  />
+                </label>
+              )}
+
+              <label className="admin-label">ID / SKU (e.g. VX-0999) <input className="filter-btn" style={{ width: '100%', marginTop: '6px' }} name="id" value={formData.id} onChange={handleChange} required disabled={isEditing} /></label>
+              <label className="admin-label">Brand <input className="filter-btn" style={{ width: '100%', marginTop: '6px' }} name="brand" value={formData.brand} onChange={handleChange} required /></label>
+              <label className="admin-label">Name <input className="filter-btn" style={{ width: '100%', marginTop: '6px' }} name="name" value={formData.name} onChange={handleChange} required /></label>
+              <label className="admin-label">Price ($) <input className="filter-btn" type="number" style={{ width: '100%', marginTop: '6px' }} name="price" value={formData.price} onChange={handleChange} required /></label>
+              <label className="admin-label">Size <input className="filter-btn" style={{ width: '100%', marginTop: '6px' }} name="size" value={formData.size} onChange={handleChange} required /></label>
+              <label className="admin-label">Category <input className="filter-btn" style={{ width: '100%', marginTop: '6px' }} name="category" value={formData.category} onChange={handleChange} required /></label>
+              <label className="admin-label">Image URL <input className="filter-btn" style={{ width: '100%', marginTop: '6px' }} name="img" value={formData.img} onChange={handleChange} required /></label>
+              
               <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
-                <button type="submit" className="btn-primary" style={{ flex: 1, justifyContent: 'center' }}><CheckCircle size={16}/> Save</button>
+                <button type="submit" className="btn-primary" style={{ flex: 1, justifyContent: 'center' }}><CheckCircle size={16}/> Save Item</button>
                 <button type="button" className="btn-ghost" onClick={() => setShowForm(false)} style={{ flex: 1, justifyContent: 'center' }}>Cancel</button>
               </div>
             </form>

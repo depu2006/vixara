@@ -343,4 +343,219 @@
           .modal-tabs button{font-size:10px;padding:9px 6px;}
           .discount-code-badge{font-size:16px;gap:7px;flex-wrap:wrap;}
         }
+
+        /* ---------- Product Status Badges on Cards ---------- */
+        .product-status-tag{
+          position:absolute;top:16px;left:16px;z-index:3;
+          padding:5px 10px;font-size:10px;font-weight:700;letter-spacing:0.12em;
+          text-transform:uppercase;font-family:'IBM Plex Mono',monospace;
+          border-radius:2px;display:flex;align-items:center;gap:5px;
+          backdrop-filter:blur(8px);
+        }
+        .status-coming-soon{
+          background:rgba(216,176,119,0.22);border:1px solid var(--brass-bright);color:var(--brass-bright);
+          box-shadow:0 0 14px rgba(216,176,119,0.3);
+        }
+        .status-coming-back{
+          background:rgba(52,211,153,0.18);border:1px solid #34d399;color:#6ee7b7;
+          box-shadow:0 0 14px rgba(52,211,153,0.25);
+        }
+        .status-out-of-stock{
+          background:rgba(239,68,68,0.18);border:1px solid #ef4444;color:#fca5a5;
+          box-shadow:0 0 14px rgba(239,68,68,0.2);
+        }
+        .piece .favorite-pill.has-status{
+          top:50px;
+        }
+
+        /* ---------- Contact Choice Intelligence Popup & Helpers ---------- */
+        .smart-choice-tooltip{
+          background:linear-gradient(135deg, rgba(216,176,119,0.18) 0%, rgba(20,20,22,0.95) 100%);
+          border:1px solid var(--brass-bright);
+          padding:10px 14px;
+          border-radius:4px;
+          margin-bottom:14px;
+          display:flex;
+          align-items:center;
+          gap:10px;
+          font-size:12px;
+          color:var(--bone);
+          animation:tooltipFadeIn 0.3s ease-out;
+          box-shadow:0 4px 20px rgba(0,0,0,0.4), 0 0 12px rgba(182,144,90,0.25);
+        }
+        @keyframes tooltipFadeIn{
+          from{opacity:0;transform:translateY(-6px);}
+          to{opacity:1;transform:translateY(0);}
+        }
+        .popular-fire-badge{
+          background:var(--brass);
+          color:var(--ink);
+          font-weight:700;
+          font-size:10px;
+          letter-spacing:0.06em;
+          padding:2px 7px;
+          border-radius:3px;
+          text-transform:uppercase;
+          white-space:nowrap;
+        }
+        .channel-advice-box{
+          background:rgba(255,255,255,0.03);
+          border:1px solid var(--hairline);
+          padding:10px 12px;
+          border-radius:4px;
+          margin-top:8px;
+          font-size:11.5px;
+          color:var(--bone-dim);
+          display:flex;
+          align-items:flex-start;
+          gap:8px;
+        }
+        .channel-advice-box strong{color:var(--brass-bright);font-weight:600;}
+        .chip-btn-wrap{position:relative;}
+        .popular-dot{
+          position:absolute;-top:6px;right:-4px;
+          background:var(--brass-bright);color:var(--ink);
+          font-size:8px;font-weight:800;padding:1px 4px;border-radius:8px;
+          box-shadow:0 0 6px var(--brass);letter-spacing:0.04em;
+        }
+
+        /* ---------- AI Price Negotiation Agent Modal & Chat ---------- */
+        .btn-ai-negotiate{
+          background:linear-gradient(135deg, rgba(216,176,119,0.15) 0%, rgba(182,144,90,0.08) 100%);
+          border:1px solid var(--brass-bright);
+          color:var(--brass-bright);
+          padding:14px 22px;
+          font-size:12px;
+          letter-spacing:0.1em;
+          text-transform:uppercase;
+          font-weight:600;
+          display:inline-flex;
+          align-items:center;
+          justify-content:center;
+          gap:8px;
+          transition:all 0.3s ease;
+          box-shadow:0 0 16px rgba(182,144,90,0.15);
+        }
+        .btn-ai-negotiate:hover{
+          background:var(--brass);
+          color:var(--ink);
+          box-shadow:0 0 24px rgba(216,176,119,0.4);
+          transform:translateY(-2px);
+        }
+        .ai-negotiate-card{
+          background:var(--card);
+          border:1px solid var(--brass);
+          max-width:560px;
+          width:100%;
+          padding:28px;
+          box-shadow:0 24px 60px rgba(0,0,0,0.8), 0 0 30px rgba(182,144,90,0.2);
+        }
+        .ai-avatar-header{
+          display:flex;align-items:center;gap:12px;
+          padding-bottom:16px;border-bottom:1px solid var(--hairline);margin-bottom:18px;
+        }
+        .ai-avatar-icon{
+          width:42px;height:42px;border-radius:50%;
+          background:linear-gradient(135deg, var(--brass) 0%, var(--brass-bright) 100%);
+          color:var(--ink);display:flex;align-items:center;justify-content:center;
+          box-shadow:0 0 16px rgba(216,176,119,0.4);
+        }
+        .ai-status-live{
+          font-size:11px;color:#34d399;display:flex;align-items:center;gap:5px;
+          font-family:'IBM Plex Mono',monospace;letter-spacing:0.05em;
+        }
+        .ai-status-live::before{
+          content:'';width:6px;height:6px;border-radius:50%;background:#34d399;
+          box-shadow:0 0 6px #34d399;
+        }
+        .ai-chat-thread{
+          display:flex;flex-direction:column;gap:12px;
+          max-height:220px;overflow-y:auto;padding-right:6px;margin-bottom:18px;
+        }
+        .ai-msg{
+          padding:12px 16px;border-radius:6px;font-size:13px;line-height:1.6;
+        }
+        .ai-msg.bot{
+          background:rgba(255,255,255,0.04);
+          border:1px solid var(--hairline);
+          color:var(--bone);
+          border-left:3px solid var(--brass-bright);
+        }
+        .ai-msg.user{
+          background:rgba(182,144,90,0.15);
+          border:1px solid var(--brass);
+          color:var(--bone);
+          align-self:flex-end;
+          max-width:85%;
+        }
+        .ai-offer-controls{
+          background:var(--ink);
+          border:1px solid var(--hairline-strong);
+          padding:18px;border-radius:4px;margin-bottom:18px;
+        }
+        .offer-slider-row{
+          display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;
+        }
+        .offer-price-tag{
+          font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:700;color:var(--brass-bright);
+        }
+        .offer-discount-pill{
+          background:rgba(182,144,90,0.2);color:var(--brass-bright);
+          padding:4px 8px;font-size:11px;border-radius:3px;font-family:'IBM Plex Mono',monospace;
+        }
+        .ai-deal-voucher{
+          background:linear-gradient(135deg, rgba(52,211,153,0.1) 0%, rgba(20,20,22,0.95) 100%);
+          border:1px dashed #34d399;padding:20px;text-align:center;margin-top:14px;
+        }
+
+        /* ---------- Storefront Coming Soon Section ---------- */
+        .coming-soon-showcase{
+          padding:90px 0;
+          background:radial-gradient(ellipse at 50% 30%, rgba(216,176,119,0.06) 0%, var(--ink) 70%);
+          border-top:1px solid var(--hairline);
+          border-bottom:1px solid var(--hairline);
+        }
+        .drop-calendar-tag{
+          display:inline-flex;align-items:center;gap:6px;
+          background:rgba(216,176,119,0.12);border:1px solid var(--brass);
+          color:var(--brass-bright);padding:4px 10px;font-size:11px;
+          font-family:'IBM Plex Mono',monospace;letter-spacing:0.06em;
+          margin-top:8px;
+        }
+
+        /* ---------- Admin Pipeline & Status Controls ---------- */
+        .status-badge-admin{
+          display:inline-flex;align-items:center;gap:5px;
+          padding:4px 10px;font-size:11px;font-family:'IBM Plex Mono',monospace;
+          border-radius:3px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;
+        }
+        .status-badge-admin.available{background:rgba(52,211,153,0.15);color:#6ee7b7;border:1px solid rgba(52,211,153,0.4);}
+        .status-badge-admin.coming-soon{background:rgba(216,176,119,0.2);color:var(--brass-bright);border:1px solid var(--brass-bright);}
+        .status-badge-admin.coming-back{background:rgba(96,165,250,0.15);color:#93c5fd;border:1px solid rgba(96,165,250,0.4);}
+        .status-badge-admin.out-of-stock{background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.4);}
+
+        .status-choice-grid{
+          display:grid;grid-template-columns:repeat(2, 1fr);gap:10px;margin-top:8px;
+        }
+        .status-choice-card{
+          border:1px solid var(--hairline-strong);padding:12px;background:var(--ink);
+          cursor:pointer;transition:all 0.2s ease;text-align:left;
+        }
+        .status-choice-card.selected{
+          border-color:var(--brass-bright);background:rgba(182,144,90,0.12);
+        }
+        .status-choice-card strong{display:block;font-size:12px;color:var(--bone);margin-bottom:2px;}
+        .status-choice-card small{font-size:11px;color:var(--bone-dim);}
+        .pipeline-metrics{
+          display:grid;grid-template-columns:repeat(4, 1fr);gap:14px;margin-bottom:26px;
+        }
+        @media(max-width:800px){
+          .pipeline-metrics{grid-template-columns:repeat(2, 1fr);}
+          .status-choice-grid{grid-template-columns:1fr;}
+        }
+        .pipeline-card{
+          background:var(--card);border:1px solid var(--hairline);padding:18px;
+        }
+        .pipeline-card span{font-size:11px;color:var(--bone-dim);letter-spacing:0.08em;text-transform:uppercase;}
+        .pipeline-card h4{font-family:'Fraunces',serif;font-size:26px;margin:8px 0 0;color:var(--brass-bright);}
       
