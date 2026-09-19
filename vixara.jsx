@@ -852,15 +852,15 @@ function GrandShowcaseHero({ products = [], onOpen, onNegotiate }) {
         <div className="grand-stage-grid">
           
           {/* Left Column: Data, Badge & Call To Actions */}
-          <div className="hero-info-col" key={`info-${current.id}-${currentIndex}`}>
-            <div className={`hero-edition-pill ${current.hue === 'hue-amber' ? 'gold' : ''}`}>
-              <Sparkles size={13} /> {current.edition || 'LIMITED EDITION'}
+          <div className="hero-info-col">
+            <div className="hero-sku-code">
+              <ShieldCheck size={14} style={{ color: "var(--brass-bright)" }} />
+              {current.sku || `VX-${current.id}`}
             </div>
-            <div className="hero-sku-code">{current.sku || `VX-${current.id}`}</div>
-            <h1 className="hero-grand-title">
+            <h1 className="hero-grand-title" key={`title-${current.id}-${currentIndex}`}>
               {current.name}
             </h1>
-            <div className="hero-meta-row">
+            <div className="hero-meta-row" key={`meta-${current.id}-${currentIndex}`}>
               <span className="hero-price-tag">${current.price.toLocaleString()}</span>
               <span className="hero-availability-tag">
                 <CheckCircle2 size={13} /> {current.status || 'AVAILABLE'}
@@ -883,22 +883,25 @@ function GrandShowcaseHero({ products = [], onOpen, onNegotiate }) {
             </div>
           </div>
 
-          {/* Center Column: 3D Floating Garment Visual */}
+          {/* Center Column: 3D Floating Garment Visual with Seamless Cross-Fade */}
           <div 
             className="hero-center-stage" 
             onClick={() => onOpen(current)}
             title="Click to view full inspection & try-on"
           >
-            <div className="hero-floating-visual-wrap" key={`visual-${current.id}-${currentIndex}`}>
+            <div className="hero-floating-visual-wrap">
               <div 
                 className="hero-floating-glow" 
                 style={{ background: current.glowColor || 'rgba(14, 116, 144, 0.4)' }}
               />
-              <img 
-                src={current.img} 
-                alt={current.name} 
-                className="hero-floating-img" 
-              />
+              {showcaseItems.map((item, idx) => (
+                <img 
+                  key={item.id}
+                  src={item.img} 
+                  alt={item.name} 
+                  className={`hero-floating-img ${idx === currentIndex ? 'active-slide' : 'inactive-slide'}`} 
+                />
+              ))}
               <div className="hero-inspect-hint">
                 <Sparkles size={12} /> Click to Inspect &amp; Try-On
               </div>
