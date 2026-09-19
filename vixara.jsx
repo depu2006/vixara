@@ -4,7 +4,7 @@ import {
   ShieldCheck, Menu, X, ArrowRight, ChevronLeft, ChevronRight,
   Upload, RefreshCw, Shirt, Sparkles, Trash2, Heart, MessageSquare,
   ThumbsDown, CheckCircle2, Copy, Zap, Bot, Clock, Flame, ShieldAlert,
-  Send, CornerDownRight, Check
+  Send, CornerDownRight, Check, Play, Eye, Award
 } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL || "https://vixara-backend.onrender.com";
@@ -21,13 +21,79 @@ const INDIAN_WEAR_TYPES = [
 ];
 
 /* ---------------------------------------------------------
-   DATA — swap this for a real API / CMS call later.
-   Keeping it as one typed array is what makes the grid,
-   the filters, and the marquee all "dynamic" from one source.
-   `views` powers the quick-view gallery: [Front, Detail, Styled].
-   In production, replace with real per-angle product photography.
+   SHOWCASE HERO PRESET METADATA (HAUTE COUTURE GARMENTS & WEAVES)
 --------------------------------------------------------- */
-/* Data is now fetched dynamically inside the VixaraSite component */
+const HERO_SHOWCASE_PRESETS = [
+  {
+    id: "VX-2001",
+    sku: "CH-3123-PABL · VX-2001",
+    edition: "LIMITED TO 15 PIECES",
+    name: "BANARASI PURE SILK SAREE – ROYAL MAROON",
+    brand: "Vixara Haute Couture",
+    price: 4999,
+    size: "Free",
+    category: "Sarees",
+    status: "Available",
+    hue: "hue-sapphire",
+    glowColor: "rgba(14, 116, 144, 0.45)",
+    img: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=80",
+    reelTitle: "Atelier Handloom Weaving",
+    reelSub: "Varanasi Pure Zari · 120 Hours",
+    reelImg: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=600&q=60"
+  },
+  {
+    id: "VX-3001",
+    sku: "CH-9343-CUBK · VX-3001",
+    edition: "LIMITED TO 50 PIECES",
+    name: "BRIDAL LEHENGA – HEAVY EMBROIDERY",
+    brand: "Vixara Bridal Vault",
+    price: 12999,
+    size: "M",
+    category: "Lehengas",
+    status: "Coming Soon",
+    drop_date: "Oct 20, 2026",
+    hue: "hue-amber",
+    glowColor: "rgba(216, 176, 119, 0.45)",
+    img: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=1000&q=80",
+    reelTitle: "Royal Zardozi Threadwork",
+    reelSub: "Hand-stitched in Jaipur Atelier",
+    reelImg: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=600&q=60"
+  },
+  {
+    id: "VX-1001",
+    sku: "CH-3715-BK · VX-1001",
+    edition: "LIMITED TO 25 PIECES",
+    name: "ANARKALI KURTI – ROSE GOLD THREAD",
+    brand: "Vixara Signature",
+    price: 1899,
+    size: "M",
+    category: "Kurtis",
+    status: "Available",
+    hue: "hue-emerald",
+    glowColor: "rgba(16, 185, 129, 0.40)",
+    img: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1000&q=80",
+    reelTitle: "3-Point Provenance Check",
+    reelSub: "Pure Silk Purity & Label Testing",
+    reelImg: "https://images.unsplash.com/photo-1614252369475-531eba835eb1?auto=format&fit=crop&w=600&q=60"
+  },
+  {
+    id: "VX-4001",
+    sku: "CH-4001-GOLD · VX-4001",
+    edition: "HERITAGE COLLECTOR PIECE",
+    name: "TEMPLE GOLD JHUMKA EARRINGS",
+    brand: "Vixara Jewels",
+    price: 899,
+    size: "Free",
+    category: "Jhumkas",
+    status: "Available",
+    hue: "hue-ruby",
+    glowColor: "rgba(225, 29, 72, 0.40)",
+    img: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1000&q=80",
+    reelTitle: "24K Gold Guilding & Pearls",
+    reelSub: "Numbered Certificate of Provenance",
+    reelImg: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=600&q=60"
+  }
+];
 
 /* ---------------------------------------------------------
    Small hook: reveals an element with a class toggle once
@@ -63,51 +129,60 @@ function ProductCard({ product, onOpen, isFavorite, onToggleFavorite }) {
   const hasStatus = product.status && product.status !== "Available";
 
   return (
-    <div className="piece" onClick={() => onOpen(product)} role="button" tabIndex={0}
-      onKeyDown={(e) => { if (e.key === "Enter") onOpen(product); }}>
-      
-      {/* Dynamic Status Badges */}
-      {product.status === "Coming Soon" && (
-        <div className="product-status-tag status-coming-soon">
-          <Clock size={11} /> Coming Soon
-        </div>
-      )}
-      {product.status === "Coming Back" && (
-        <div className="product-status-tag status-coming-back">
-          <Sparkles size={11} /> Restocking
-        </div>
-      )}
-      {product.status === "Out of Stock" && (
-        <div className="product-status-tag status-out-of-stock">
-          <ShieldAlert size={11} /> Sold Out
-        </div>
-      )}
+    <div 
+      className="luxury-piece-card" 
+      onClick={() => onOpen(product)} 
+      role="button" 
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === "Enter") onOpen(product); }}
+    >
+      <div className="luxury-card-img-wrap">
+        {/* Dynamic Status Badges */}
+        {product.status === "Coming Soon" && (
+          <div className="product-status-tag status-coming-soon">
+            <Clock size={11} /> Coming Soon
+          </div>
+        )}
+        {product.status === "Coming Back" && (
+          <div className="product-status-tag status-coming-back">
+            <Sparkles size={11} /> Restocking
+          </div>
+        )}
+        {product.status === "Out of Stock" && (
+          <div className="product-status-tag status-out-of-stock">
+            <ShieldAlert size={11} /> Sold Out
+          </div>
+        )}
 
-      <button
-        className={`favorite-pill ${isFavorite ? "active" : ""} ${hasStatus ? "has-status" : ""}`}
-        onClick={(e) => { e.stopPropagation(); onToggleFavorite(product); }}
-        aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
-      >
-        <Heart size={14} strokeWidth={1.8} fill={isFavorite ? "currentColor" : "none"} />
-      </button>
-      <img src={product.img} alt={`${product.brand} ${product.name}`} />
-      <div className="seal">
-        <ShieldCheck size={16} strokeWidth={1.5} />
-        <div className="seal-text">VERIFIED<br />AUTHENTIC<br />{product.id}</div>
+        <button
+          className={`favorite-pill ${isFavorite ? "active" : ""} ${hasStatus ? "has-status" : ""}`}
+          onClick={(e) => { e.stopPropagation(); onToggleFavorite(product); }}
+          aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+        >
+          <Heart size={14} strokeWidth={1.8} fill={isFavorite ? "currentColor" : "none"} />
+        </button>
+
+        <img src={product.img} alt={`${product.brand} ${product.name}`} />
+        
+        <div className="seal">
+          <ShieldCheck size={16} strokeWidth={1.5} />
+          <div className="seal-text">VERIFIED<br />AUTHENTIC<br />{product.id}</div>
+        </div>
+
+        <div className="quick-view-tag">Inspect Piece</div>
       </div>
-      <div className="piece-info">
-        <div className="piece-brand">{product.brand}</div>
-        <div className="piece-name">{product.name}</div>
-        <div className="piece-price">
-          ${product.price.toLocaleString()} · Size {product.size}
-          {product.drop_date && (
-            <span style={{ display: "block", fontSize: 11, color: "var(--brass-bright)", marginTop: 2 }}>
-              🗓 {product.drop_date}
-            </span>
-          )}
+
+      <div className="luxury-card-meta">
+        <div className="luxury-card-sku">{product.id} · {product.category || 'Atelier'}</div>
+        <h3 className="luxury-card-name">{product.name}</h3>
+        
+        <div className="luxury-card-footer">
+          <div className="luxury-card-price">${product.price.toLocaleString()}</div>
+          <div style={{ fontSize: 11, color: "var(--bone-dim)", fontFamily: "'IBM Plex Mono', monospace" }}>
+            Size {product.size || 'Free'}
+          </div>
         </div>
       </div>
-      <div className="quick-view-tag">Quick View</div>
     </div>
   );
 }
@@ -716,13 +791,320 @@ function FavoritesDrawer({ open, onClose, favorites, onToggleFavorite }) {
 }
 
 
+/* =========================================================
+   GRAND SHOWCASE HERO COMPONENT (CHRONOSWISS-INSPIRED LUXURY FOR GARMENTS)
+   ========================================================= */
+function GrandShowcaseHero({ products = [], onOpen, onNegotiate }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  // Combine database products with rich showcase metadata
+  const showcaseItems = HERO_SHOWCASE_PRESETS.map((preset) => {
+    const matchingDb = products.find(p => p.id === preset.id || p.category === preset.category);
+    if (matchingDb) {
+      return {
+        ...preset,
+        ...matchingDb,
+        sku: preset.sku,
+        edition: preset.edition,
+        hue: preset.hue,
+        glowColor: preset.glowColor,
+        img: matchingDb.img || preset.img,
+        reelTitle: preset.reelTitle,
+        reelSub: preset.reelSub,
+        reelImg: preset.reelImg
+      };
+    }
+    return preset;
+  });
+
+  const total = showcaseItems.length;
+  const current = showcaseItems[currentIndex] || showcaseItems[0];
+  const prevItem = showcaseItems[(currentIndex - 1 + total) % total];
+  const nextItem = showcaseItems[(currentIndex + 1) % total];
+
+  const goNext = useCallback(() => {
+    setCurrentIndex(i => (i + 1) % total);
+  }, [total]);
+
+  const goPrev = useCallback(() => {
+    setCurrentIndex(i => (i - 1 + total) % total);
+  }, [total]);
+
+  // Auto rotation
+  useEffect(() => {
+    if (isPaused) return;
+    const timer = setInterval(() => {
+      goNext();
+    }, 5500);
+    return () => clearInterval(timer);
+  }, [isPaused, goNext]);
+
+  return (
+    <section 
+      className={`grand-showcase ${current.hue || 'hue-sapphire'}`}
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      <div className="wrap" style={{ width: "100%" }}>
+        
+        {/* Main 3-Column Stage Grid */}
+        <div className="grand-stage-grid">
+          
+          {/* Left Column: Data, Badge & Call To Actions */}
+          <div className="hero-info-col" key={`info-${current.id}-${currentIndex}`}>
+            <div className={`hero-edition-pill ${current.hue === 'hue-amber' ? 'gold' : ''}`}>
+              <Sparkles size={13} /> {current.edition || 'LIMITED EDITION'}
+            </div>
+            <div className="hero-sku-code">{current.sku || `VX-${current.id}`}</div>
+            <h1 className="hero-grand-title">
+              {current.name}
+            </h1>
+            <div className="hero-meta-row">
+              <span className="hero-price-tag">${current.price.toLocaleString()}</span>
+              <span className="hero-availability-tag">
+                <CheckCircle2 size={13} /> {current.status || 'AVAILABLE'}
+              </span>
+            </div>
+            
+            <div className="hero-cta-group">
+              <button 
+                className={current.hue === 'hue-amber' ? 'btn-pill-gold' : 'btn-pill-cyan'}
+                onClick={() => onOpen(current)}
+              >
+                <Eye size={14} /> Explore Piece
+              </button>
+              <button 
+                className="btn-pill-ghost"
+                onClick={() => onNegotiate(current)}
+              >
+                <Bot size={14} /> Negotiate Price
+              </button>
+            </div>
+          </div>
+
+          {/* Center Column: 3D Floating Garment Visual */}
+          <div 
+            className="hero-center-stage" 
+            onClick={() => onOpen(current)}
+            title="Click to view full inspection & try-on"
+          >
+            <div className="hero-floating-visual-wrap" key={`visual-${current.id}-${currentIndex}`}>
+              <div 
+                className="hero-floating-glow" 
+                style={{ background: current.glowColor || 'rgba(14, 116, 144, 0.4)' }}
+              />
+              <img 
+                src={current.img} 
+                alt={current.name} 
+                className="hero-floating-img" 
+              />
+              <div className="hero-inspect-hint">
+                <Sparkles size={12} /> Click to Inspect &amp; Try-On
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Atelier Craftsmanship Reel */}
+          <div 
+            className="hero-reel-card"
+            onClick={() => onOpen(current)}
+          >
+            <div className="hero-reel-thumb-wrap">
+              <img src={current.reelImg} alt="Atelier Craftsmanship" />
+              <div className="pulse-play-btn">
+                <Play size={16} fill="currentColor" />
+              </div>
+            </div>
+            <div className="hero-reel-meta">
+              <h5>{current.reelTitle || 'Handloom Craftsmanship'}</h5>
+              <p>{current.reelSub || 'Authentic Varanasi atelier weaving process'}</p>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Bottom Dial & Slide Navigator (The Chronoswiss-Style Dial) */}
+        <div className="hero-dial-navigator">
+          
+          {/* Previous Piece Ticker */}
+          <div className="hero-nav-ticker" onClick={goPrev}>
+            <ChevronLeft size={16} />
+            <span>{prevItem.name.split('–')[0].slice(0, 24)}</span>
+          </div>
+
+          {/* Center Numbered Step Gauge Dial */}
+          <div className="dial-track-container">
+            <div className="dial-gauge">
+              {showcaseItems.map((item, idx) => (
+                <div 
+                  key={idx} 
+                  className={`dial-step-node ${idx === currentIndex ? 'active' : ''}`}
+                  onClick={() => setCurrentIndex(idx)}
+                >
+                  <span className="dial-tick" />
+                  <span className="dial-dot">0{idx + 1}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Next Piece Ticker */}
+          <div className="hero-nav-ticker" onClick={goNext}>
+            <span>{nextItem.name.split('–')[0].slice(0, 24)}</span>
+            <ChevronRight size={16} />
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================
+   ATELIER CRAFTSMANSHIP & PROVENANCE STORY STRIP
+   ========================================================= */
+function CraftsmanshipStrip({ onExploreClick }) {
+  return (
+    <section className="craft-strip-section">
+      <div className="wrap">
+        <div className="craft-strip-grid">
+          
+          <div className="craft-story-card" onClick={onExploreClick}>
+            <div className="craft-story-img-box">
+              <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=240&q=80" alt="Master Weaver" />
+            </div>
+            <div className="craft-story-text">
+              <span>HERITAGE ATELIER</span>
+              <h4>Master Handloom Guild</h4>
+              <p>Over 120+ artisan hours woven into each pure silk piece.</p>
+            </div>
+          </div>
+
+          <div className="craft-story-card" onClick={onExploreClick}>
+            <div className="craft-story-img-box">
+              <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=240&q=80" alt="Zari Test" />
+            </div>
+            <div className="craft-story-text">
+              <span>MATERIAL ASSURANCE</span>
+              <h4>Pure Zari &amp; Silk Lab Tested</h4>
+              <p>24K gold electroplated zari &amp; authenticated weave density.</p>
+            </div>
+          </div>
+
+          <div className="craft-story-card" onClick={onExploreClick}>
+            <div className="craft-story-img-box">
+              <img src="https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=240&q=80" alt="Provenance Certificate" />
+            </div>
+            <div className="craft-story-text">
+              <span>CHAIN OF CUSTODY</span>
+              <h4>Tamper-Proof Provenance</h4>
+              <p>Individually serialized physical certificate of authenticity.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================
+   LUXURY FILTER DECK & INTERACTIVE COLLECTION CONSOLE
+   ========================================================= */
+function LuxuryFilterDeck({ 
+  category, setCategory, 
+  sizeFilter, setSizeFilter, 
+  colorFilter, setColorFilter,
+  categories = [] 
+}) {
+  const COLOR_SWATCHES = [
+    { id: "All", label: "All Hues", color: "transparent" },
+    { id: "Gold", label: "Amber / Gold Zari", color: "#d8b077" },
+    { id: "Blue", label: "Sapphire Blue", color: "#0ea5e9" },
+    { id: "Green", label: "Emerald Green", color: "#10b981" },
+    { id: "Maroon", label: "Royal Maroon", color: "#be123c" },
+    { id: "Midnight", label: "Midnight Black", color: "#18181b" }
+  ];
+
+  const SIZES = ["All", "S", "M", "L", "XL", "Free"];
+
+  return (
+    <div className="luxury-filter-deck">
+      
+      {/* Category Pills Row */}
+      <div className="filter-deck-row">
+        <div className="filter-deck-group">
+          <span className="filter-deck-label">Collection Edit:</span>
+          <div className="filter-pills-bar">
+            {categories.map(cat => (
+              <button
+                key={cat}
+                className={`deck-pill ${category === cat ? 'active' : ''}`}
+                onClick={() => setCategory(cat)}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Sizes & Color Swatches Row */}
+      <div className="filter-deck-row">
+        
+        {/* Size Selection */}
+        <div className="filter-deck-group">
+          <span className="filter-deck-label">Size Gauge:</span>
+          <div className="size-dial-group">
+            {SIZES.map(s => (
+              <button
+                key={s}
+                className={`size-dial-btn ${sizeFilter === s ? 'active' : ''}`}
+                onClick={() => setSizeFilter(s)}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Color Swatches */}
+        <div className="filter-deck-group">
+          <span className="filter-deck-label">Material Hue:</span>
+          <div className="color-swatch-group">
+            {COLOR_SWATCHES.map(swatch => (
+              <div
+                key={swatch.id}
+                className={`color-swatch-dot ${colorFilter === swatch.id ? 'active' : ''}`}
+                style={{ 
+                  background: swatch.color === 'transparent' ? 'var(--card)' : swatch.color,
+                  border: swatch.color === 'transparent' ? '1px solid var(--hairline-strong)' : undefined
+                }}
+                onClick={() => setColorFilter(swatch.id)}
+                title={swatch.label}
+              />
+            ))}
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
+
 export default function VixaraSite() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [category, setCategory] = useState("All");
+  const [sizeFilter, setSizeFilter] = useState("All");
+  const [colorFilter, setColorFilter] = useState("All");
   const [email, setEmail] = useState("");
   const [requested, setRequested] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [negotiateProduct, setNegotiateProduct] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [favoritesOpen, setFavoritesOpen] = useState(false);
 
@@ -769,7 +1151,18 @@ export default function VixaraSite() {
       .catch(err => console.error("Error fetching products:", err));
   }, []);
 
-  const filtered = category === "All" ? products : products.filter(p => p.category === category);
+  const filtered = products.filter(p => {
+    const matchCategory = category === "All" || p.category === category;
+    const matchSize = sizeFilter === "All" || p.size === sizeFilter;
+    const matchColor = colorFilter === "All" || (
+      colorFilter === "Gold" ? (p.name.toLowerCase().includes("gold") || p.name.toLowerCase().includes("zari") || p.name.toLowerCase().includes("mustard")) :
+      colorFilter === "Blue" ? (p.name.toLowerCase().includes("blue") || p.name.toLowerCase().includes("teal") || p.name.toLowerCase().includes("indigo")) :
+      colorFilter === "Green" ? (p.name.toLowerCase().includes("olive") || p.name.toLowerCase().includes("green") || p.name.toLowerCase().includes("emerald")) :
+      colorFilter === "Maroon" ? (p.name.toLowerCase().includes("maroon") || p.name.toLowerCase().includes("rose") || p.name.toLowerCase().includes("pink") || p.name.toLowerCase().includes("red")) :
+      colorFilter === "Midnight" ? (p.name.toLowerCase().includes("black") || p.name.toLowerCase().includes("midnight") || p.name.toLowerCase().includes("dark")) : true
+    );
+    return matchCategory && matchSize && matchColor;
+  });
 
   const toggleFavorite = useCallback((product) => {
     setFavorites((prev) => {
@@ -799,7 +1192,6 @@ export default function VixaraSite() {
   return (
     <div className="vx-root">
       
-
       <header className={scrolled ? "scrolled" : ""}>
         <div className="logo">VIX<em>ARA</em></div>
         <div className="nav-links">
@@ -831,20 +1223,17 @@ export default function VixaraSite() {
         </div>
       )}
 
-      <section className="hero">
-        <div className="hero-bg"></div>
-        <div className="hero-inner wrap">
-          <div className="eyebrow">Est. 2026 · Verified Premium Only</div>
-          <h1>Every piece,<br /><span className="accent">provenance</span> intact.</h1>
-          <div className="hero-sub">
-            <p>Vixara curates a closed circle of premium and designer garments — each one authenticated, catalogued, and sealed before it reaches you.</p>
-            <div className="hero-actions">
-              <Link to="/collection" className="btn-primary">Enter the Collection <ArrowRight size={15} /></Link>
-              <a href="#manifesto" className="btn-ghost" onClick={(e) => scrollToSection('#manifesto', e)}>Our Standard</a>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Grand Cinematic Hero Showcase (Chronoswiss-Style for Luxury Clothes & Weaves) */}
+      <GrandShowcaseHero 
+        products={products}
+        onOpen={setSelectedProduct}
+        onNegotiate={setNegotiateProduct}
+      />
+
+      {/* Atelier Craftsmanship & Provenance Story Strip */}
+      <CraftsmanshipStrip 
+        onExploreClick={(e) => scrollToSection('#manifesto', e)}
+      />
 
       <div className="seam-wrap"><div className="seam"></div></div>
 
@@ -861,16 +1250,43 @@ export default function VixaraSite() {
               <span className="tag">Curated Spotlight</span>
               <h2>Featured Edit —<br />nothing enters unverified.</h2>
             </div>
-            <p>Click any piece for quick view, try-on studio &amp; VIP reservations.</p>
+            <p>Filter by garment edit, size gauge, or silk hue. Click any piece for quick inspection, try-on studio &amp; AI price negotiation.</p>
           </Reveal>
-        </div>
-        <div className="grid">
-          {products.slice(0, 4).map(p => <ProductCard key={p.id} product={p} onOpen={setSelectedProduct} isFavorite={isFavorite(p)} onToggleFavorite={toggleFavorite} />)}
-        </div>
-        <div style={{ textAlign: "center", marginTop: 44 }}>
-          <Link to="/collection" className="btn-primary" style={{ padding: "18px 42px", fontSize: 14 }}>
-            Explore Full Collection ({products.length} Pieces) <ArrowRight size={16} />
-          </Link>
+
+          {/* Luxury Filter Deck */}
+          <LuxuryFilterDeck 
+            category={category}
+            setCategory={setCategory}
+            sizeFilter={sizeFilter}
+            setSizeFilter={setSizeFilter}
+            colorFilter={colorFilter}
+            setColorFilter={setColorFilter}
+            categories={categories}
+          />
+
+          <div className="luxury-card-grid">
+            {filtered.slice(0, 6).map(p => (
+              <ProductCard 
+                key={p.id} 
+                product={p} 
+                onOpen={setSelectedProduct} 
+                isFavorite={isFavorite(p)} 
+                onToggleFavorite={toggleFavorite} 
+              />
+            ))}
+          </div>
+
+          {filtered.length === 0 && (
+            <div style={{ textAlign: "center", padding: "40px", color: "var(--bone-dim)" }}>
+              No pieces match your active size or hue filter. Try selecting "All".
+            </div>
+          )}
+
+          <div style={{ textAlign: "center", marginTop: 48 }}>
+            <Link to="/collection" className="btn-primary" style={{ padding: "18px 42px", fontSize: 14 }}>
+              Explore Full Collection ({products.length} Pieces) <ArrowRight size={16} />
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -901,6 +1317,9 @@ export default function VixaraSite() {
       </section>
 
       <ProductModal product={selectedProduct} onClose={() => setSelectedProduct(null)} isFavorite={selectedProduct ? isFavorite(selectedProduct) : false} onToggleFavorite={toggleFavorite} />
+      {negotiateProduct && (
+        <AINegotiationModal product={negotiateProduct} onClose={() => setNegotiateProduct(null)} />
+      )}
       <section className="section" id="manifesto" style={{paddingTop:0}}>
         <div className="wrap">
           <Reveal className="manifesto">
