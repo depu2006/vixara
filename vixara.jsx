@@ -1023,6 +1023,679 @@ function CraftsmanshipStrip({ onExploreClick }) {
 }
 
 /* =========================================================
+   LIVE ATELIER ACTIVITY & CONCIERGE PULSE BAR
+   ========================================================= */
+const LIVE_PULSE_UPDATES = [
+  {
+    type: "Reservation",
+    text: "VIP Connoisseur in Mayfair reserved Varanasi Katan Silk Saree (VX-2001)",
+    time: "2m ago",
+    sku: "VX-2001"
+  },
+  {
+    type: "AI Concierge",
+    text: "Private offer accepted: -10% on Royal Jaipur Zardozi Lehenga",
+    time: "6m ago",
+    sku: "VX-3001"
+  },
+  {
+    type: "Certification",
+    text: "Forensic Weave Provenance Seal issued for Emerald Green Anarkali",
+    time: "14m ago",
+    sku: "VX-2004"
+  },
+  {
+    type: "Vault Drop",
+    text: "Restock Alert: Only 2 pieces remaining in Kanjivaram Korvai Silk Edition",
+    time: "28m ago",
+    sku: "VX-2002"
+  }
+];
+
+function LiveAtelierPulseBar({ onExplorePiece }) {
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveIdx(prev => (prev + 1) % LIVE_PULSE_UPDATES.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, []);
+
+  const cur = LIVE_PULSE_UPDATES[activeIdx];
+
+  return (
+    <div className="atelier-pulse-bar">
+      <div className="wrap">
+        <div className="pulse-bar-inner">
+          <div className="pulse-badge">
+            <span className="live-dot" />
+            <span>Live Atelier Activity</span>
+          </div>
+
+          <div className="pulse-message-wrap">
+            <span className="pulse-time">{cur.time}</span>
+            <span className="pulse-message-text">{cur.text}</span>
+          </div>
+
+          <button 
+            className="pulse-action-btn"
+            onClick={() => onExplorePiece && onExplorePiece(cur.sku)}
+          >
+            <Sparkles size={12} /> Explore Feed
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================
+   OCCASION & SILHOUETTE STYLIST CONCIERGE
+   ========================================================= */
+const OCCASION_PRESETS = [
+  {
+    id: "bridal",
+    label: "Royal Wedding / Bridal",
+    icon: "👑",
+    vibe: "Maximalist 24K Gold Zari · Heirloom Katan Silks & Royal Red Zardozi",
+    garments: [
+      {
+        id: "VX-3001",
+        name: "Jaipur Heavy Zardozi Bridal Lehenga",
+        tag: "Imperial Bridal",
+        craft: "240 Artisan Hours",
+        price: 12999,
+        img: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        id: "VX-2001",
+        name: "Banarasi Pure Katan Silk Saree – Royal Maroon",
+        tag: "Heritage Weave",
+        craft: "180 Artisan Hours",
+        price: 4999,
+        img: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        id: "VX-4001",
+        name: "Handcrafted 22K Gold Temple Jhumkas & Haar",
+        tag: "Heirloom Jewels",
+        craft: "Hand-cast Jadau",
+        price: 3850,
+        img: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=800&q=80"
+      }
+    ]
+  },
+  {
+    id: "sangeet",
+    label: "Sangeet & Cocktail Soirée",
+    icon: "🌙",
+    vibe: "Dramatic Velvet Drape · Sapphire Georgette & Modern Shararas",
+    garments: [
+      {
+        id: "VX-2003",
+        name: "Nocturnal Sapphire Blue Georgette Sharara Set",
+        tag: "Soirée Drape",
+        craft: "110 Artisan Hours",
+        price: 2850,
+        img: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        id: "VX-2005",
+        name: "Kashmiri Silk Velvet Kurti Set – Midnight Gold",
+        tag: "Royal Velvet",
+        craft: "140 Artisan Hours",
+        price: 3200,
+        img: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        id: "VX-4002",
+        name: "Uncut Emerald Kundan Polki Choker Set",
+        tag: "Heritage Jewels",
+        craft: "Meenakari Inlay",
+        price: 2450,
+        img: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=800&q=80"
+      }
+    ]
+  },
+  {
+    id: "gala",
+    label: "Heritage Reception & Gala",
+    icon: "🏛️",
+    vibe: "Regal Silhouettes · Handloom Organza & Temple Korvai Silks",
+    garments: [
+      {
+        id: "VX-2002",
+        name: "Pure Kanjivaram Korvai Silk Saree – Gold Zari",
+        tag: "South Handloom",
+        craft: "210 Artisan Hours",
+        price: 5400,
+        img: "https://images.unsplash.com/photo-1610030469668-93510cb67655?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        id: "VX-2004",
+        name: "Ivory Lucknowi Chikankari & Mukaish Anarkali",
+        tag: "Awadh Atelier",
+        craft: "220 Artisan Hours",
+        price: 3950,
+        img: "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        id: "VX-4003",
+        name: "Antique Victorian Polki Emerald Kada Pair",
+        tag: "Temple Kada",
+        craft: "Master Goldsmith",
+        price: 1950,
+        img: "https://images.unsplash.com/photo-1611591475152-47e2a149023f?auto=format&fit=crop&w=800&q=80"
+      }
+    ]
+  },
+  {
+    id: "festive",
+    label: "Festive Puja & Temple Celebrations",
+    icon: "🪔",
+    vibe: "Auspicious Amber Tones · Pure Mulberry Warp & Lightweight Zari",
+    garments: [
+      {
+        id: "VX-2006",
+        name: "Amber Mustard Banarasi Brocade Kurti Ensemble",
+        tag: "Festive Classic",
+        craft: "95 Artisan Hours",
+        price: 1850,
+        img: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        id: "VX-2007",
+        name: "Crimson Tussar Silk Hand-Embroidered Saree",
+        tag: "Tussar Handloom",
+        craft: "130 Artisan Hours",
+        price: 2600,
+        img: "https://images.unsplash.com/photo-1609357605129-26f69add5d6e?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        id: "VX-4004",
+        name: "Hand-Crafted Gold Temple Pendant & Jhumka Set",
+        tag: "Temple Gold",
+        craft: "22K Hallmark",
+        price: 1250,
+        img: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=800&q=80"
+      }
+    ]
+  }
+];
+
+function OccasionSilhouetteMatcher({ onOpen, onNegotiate }) {
+  const [activeOccasion, setActiveOccasion] = useState(OCCASION_PRESETS[0].id);
+  const current = OCCASION_PRESETS.find(o => o.id === activeOccasion) || OCCASION_PRESETS[0];
+
+  return (
+    <section className="occasion-section" id="occasions">
+      <div className="wrap">
+        <Reveal className="section-head">
+          <div>
+            <span className="tag" style={{ color: "var(--brass-bright)" }}>Atelier Stylist Concierge</span>
+            <h2>Curated by Occasion —<br />master the royal dress code.</h2>
+          </div>
+          <p>Select your royal celebration to uncover certified weaves, artisan silhouettes, and private AI-negotiable heirlooms.</p>
+        </Reveal>
+
+        <div className="occasion-pills-wrap">
+          {OCCASION_PRESETS.map((occ) => (
+            <button
+              key={occ.id}
+              className={`occasion-pill-btn ${activeOccasion === occ.id ? 'active' : ''}`}
+              onClick={() => setActiveOccasion(occ.id)}
+            >
+              <span>{occ.icon}</span>
+              <span>{occ.label}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="occasion-vibe-bar">
+          <div className="occasion-vibe-title">
+            <Sparkles size={14} /> Dress Code &amp; Palette
+          </div>
+          <div className="occasion-vibe-text">{current.vibe}</div>
+        </div>
+
+        <div className="occasion-cards-grid">
+          {current.garments.map((g) => (
+            <div key={g.id} className="occasion-card">
+              <div className="occasion-card-img-wrap">
+                <img src={g.img} alt={g.name} />
+                <span className="occasion-card-tag">{g.tag}</span>
+              </div>
+              <div className="occasion-card-body">
+                <h4 className="occasion-card-title">{g.name}</h4>
+                <div className="occasion-card-meta">
+                  <span>{g.craft}</span>
+                  <span className="occasion-card-price">${g.price.toLocaleString()}</span>
+                </div>
+                <div className="occasion-card-actions">
+                  <button 
+                    className="occasion-btn-inspect"
+                    onClick={() => onOpen(g)}
+                  >
+                    <Eye size={13} /> Inspect
+                  </button>
+                  <button 
+                    className="occasion-btn-negotiate"
+                    onClick={() => onNegotiate(g)}
+                  >
+                    <Bot size={13} /> Negotiate
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================
+   FABRIC & ZARI SENSORY STUDIO (THE ATELIER ANATOMY)
+   ========================================================= */
+const FABRIC_STUDIO_PRESETS = [
+  {
+    id: "zari",
+    name: "24K Real Gold Zari & Katan Silk",
+    badge: "Varanasi Master Guild",
+    desc: "Spun from 22-micron silver core wires electroplated in 24-karat gold, woven alongside Mulberry silk warp on heritage pit looms. Never tarnishes or oxidises.",
+    img: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=80",
+    metrics: [
+      { label: "Weave Time", value: "180+ Hours" },
+      { label: "Fabric Density", value: "580 GSM" },
+      { label: "Metallurgy", value: "24K Gold Over Silver" },
+      { label: "Loom Type", value: "Varanasi Pit Loom" }
+    ],
+    hotspots: [
+      { top: "35%", left: "45%", title: "24K Gold Zari Warp", note: "Certified 22-micron electroplated silver wire" },
+      { top: "65%", left: "60%", title: "Kadwa Buta Motif", note: "Individually hand-locked motif threads with no floating back yarns" },
+      { top: "50%", left: "25%", title: "Grade 6A Mulberry Silk", note: "High-twist warp with natural high sheen" }
+    ]
+  },
+  {
+    id: "kanjivaram",
+    name: "Pure Mulberry Korvai Silk",
+    badge: "Kanchipuram Silk Mark",
+    desc: "Features the legendary Korvai interlocking technique where the border and body are woven with three shuttles simultaneously, yielding unbreakable temple seam strength.",
+    img: "https://images.unsplash.com/photo-1610030469668-93510cb67655?auto=format&fit=crop&w=1000&q=80",
+    metrics: [
+      { label: "Weave Time", value: "210+ Hours" },
+      { label: "Fabric Density", value: "620 GSM Heavy" },
+      { label: "Yarn Construction", value: "3-Ply Twisted Silk" },
+      { label: "Interlocking", value: "Petni Temple Seam" }
+    ],
+    hotspots: [
+      { top: "30%", left: "55%", title: "Korvai Triple-Shuttle Seam", note: "Interlocked body-to-border weave without machine stitches" },
+      { top: "70%", left: "40%", title: "Temple Spire Zari Border", note: "Pure silver zari with geometric sacred architecture motifs" }
+    ]
+  },
+  {
+    id: "chikankari",
+    name: "Awadh Hand Chikankari & Mukaish",
+    badge: "Lucknow Heritage Atelier",
+    desc: "An ethereal marriage of 32 intricate shadow-stitch embroidery techniques on superfine sheer organza, accented with flat metallic Mukaish silver badla work.",
+    img: "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1000&q=80",
+    metrics: [
+      { label: "Needlework Time", value: "240+ Hours" },
+      { label: "Stitch Variety", value: "32 Heritage Stitches" },
+      { label: "Base Fabric", value: "Mulberry Silk Organza" },
+      { label: "Embellishment", value: "Pure Silver Badla Mukaish" }
+    ],
+    hotspots: [
+      { top: "40%", left: "50%", title: "Phanda & Bakhiya Stitches", note: "Microscopic floral knots creating embossed shadow relief" },
+      { top: "60%", left: "35%", title: "Mukaish Badla Inlay", note: "Hand-flattened silver dots embedded between silk meshes" }
+    ]
+  },
+  {
+    id: "velvet",
+    name: "Kashmiri Silk Velvet & Antique Tilla",
+    badge: "Srinagar Craft Council",
+    desc: "Deep nocturnal silk-blend velvet ground embellished with Kashmiri Tilla gold needlework depicting Chinar leaves, Persian paisleys, and floral medallions.",
+    img: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=1000&q=80",
+    metrics: [
+      { label: "Embroidery Time", value: "160+ Hours" },
+      { label: "Pile Density", value: "480 GSM Micro-Pile" },
+      { label: "Metallic Cord", value: "Silver-Gilt Tilla Thread" },
+      { label: "Provenance", value: "Kashmir Valley Atelier" }
+    ],
+    hotspots: [
+      { top: "35%", left: "50%", title: "Antique Silver Tilla Wire", note: "Pure silver-plated metallic thread hammered into the velvet ground" },
+      { top: "70%", left: "60%", title: "Lush Micro-Pile Velvet", note: "Ultra-soft drape with opulent light-absorbing luster" }
+    ]
+  }
+];
+
+function AtelierFabricStudio({ onOpenCatalog }) {
+  const [activeTab, setActiveTab] = useState(FABRIC_STUDIO_PRESETS[0].id);
+  const [activeHotspot, setActiveHotspot] = useState(null);
+
+  const current = FABRIC_STUDIO_PRESETS.find(f => f.id === activeTab) || FABRIC_STUDIO_PRESETS[0];
+
+  return (
+    <section className="fabric-studio-section" id="anatomy">
+      <div className="wrap">
+        <Reveal className="section-head">
+          <div>
+            <span className="tag" style={{ color: "var(--brass-bright)" }}>The Atelier Anatomy</span>
+            <h2>Microscopic Weave Studio —<br />touch the pedigree of certified cloth.</h2>
+          </div>
+          <p>Inspect the metallurgy of 24k zari, warp densities, and generational handloom techniques verified under forensic gemological standards.</p>
+        </Reveal>
+
+        <div className="fabric-studio-layout">
+          
+          {/* Visual Display with Glowing Interactive Hotspot Radar Pins */}
+          <div className="fabric-macro-display">
+            <img src={current.img} alt={current.name} className="fabric-macro-img" />
+            <div className="fabric-macro-overlay" />
+
+            {current.hotspots.map((h, i) => (
+              <div 
+                key={i} 
+                className={`fabric-hotspot ${activeHotspot === i ? 'active' : ''}`}
+                style={{ top: h.top, left: h.left }}
+                onMouseEnter={() => setActiveHotspot(i)}
+                onMouseLeave={() => setActiveHotspot(null)}
+                onClick={() => setActiveHotspot(activeHotspot === i ? null : i)}
+              >
+                <div className="hotspot-radar">
+                  <div className="hotspot-dot" />
+                </div>
+                <div className="hotspot-tooltip">
+                  <strong>{h.title}</strong>
+                  <br />
+                  <span style={{ color: "var(--bone-dim)", fontSize: "10px" }}>{h.note}</span>
+                </div>
+              </div>
+            ))}
+
+            <div className="fabric-macro-badge">
+              <ShieldCheck size={14} /> {current.badge}
+            </div>
+          </div>
+
+          {/* Interactive Information & Guild Specs */}
+          <div className="fabric-info-col">
+            <div className="fabric-nav-tabs">
+              {FABRIC_STUDIO_PRESETS.map((f) => (
+                <button
+                  key={f.id}
+                  className={`fabric-tab-btn ${activeTab === f.id ? 'active' : ''}`}
+                  onClick={() => {
+                    setActiveTab(f.id);
+                    setActiveHotspot(null);
+                  }}
+                >
+                  {f.name.split('–')[0].split('&')[0]}
+                </button>
+              ))}
+            </div>
+
+            <h3 className="fabric-lead-title">{current.name}</h3>
+            <p className="fabric-lead-desc">{current.desc}</p>
+
+            <div className="fabric-metrics-grid">
+              {current.metrics.map((m, i) => (
+                <div key={i} className="fabric-metric-card">
+                  <span className="fabric-metric-lbl">{m.label}</span>
+                  <span className="fabric-metric-val">{m.value}</span>
+                </div>
+              ))}
+            </div>
+
+            <button 
+              className="btn-primary"
+              style={{ width: "100%", justifyContent: "center" }}
+              onClick={onOpenCatalog}
+            >
+              <Eye size={15} /> Explore {current.name.split(' ')[0]} Masterpieces
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================
+   ROYAL ENSEMBLE LOOKBOOK ("SHOP THE LOOK")
+   ========================================================= */
+const ROYAL_LOOKBOOK_PRESETS = [
+  {
+    id: "look-1",
+    title: "The Varanasi Maharani",
+    tag: "Ensemble 01 · Royal Wedding",
+    desc: "A timeless bridal edit pairing a handwoven heavy zari Banarasi Katan silk saree with antique 22K temple jewellery and a hand-stitched zardozi potli.",
+    modelImg: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=900&q=80",
+    totalVal: 7299,
+    pieces: [
+      {
+        name: "Banarasi Pure Katan Silk Saree",
+        type: "Couture Garment",
+        price: 4999,
+        img: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=160&q=80"
+      },
+      {
+        name: "22K Gold Temple Jadau Choker Set",
+        type: "Heirloom Jewellery",
+        price: 1850,
+        img: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=160&q=80"
+      },
+      {
+        name: "Hand-Embroidered Zardozi Silk Potli",
+        type: "Atelier Accessory",
+        price: 450,
+        img: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=160&q=80"
+      }
+    ]
+  },
+  {
+    id: "look-2",
+    title: "The Midnight Velvet Soirée",
+    tag: "Ensemble 02 · Sangeet & Gala",
+    desc: "Sumptuous indigo micro-velvet tailored with antique silver tilla needlework, complemented by unblemished Emerald Polki and pure organza drape.",
+    modelImg: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=900&q=80",
+    totalVal: 6150,
+    pieces: [
+      {
+        name: "Royal Indigo Silk Velvet Kurta & Sharara",
+        type: "Couture Garment",
+        price: 3400,
+        img: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=160&q=80"
+      },
+      {
+        name: "Uncut Emerald Kundan Polki Choker Set",
+        type: "Heirloom Jewellery",
+        price: 2100,
+        img: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=160&q=80"
+      },
+      {
+        name: "Fine Organza Zari Scallop Dupatta",
+        type: "Atelier Accessory",
+        price: 650,
+        img: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=160&q=80"
+      }
+    ]
+  },
+  {
+    id: "look-3",
+    title: "The Imperial Bridal Empress",
+    tag: "Ensemble 03 · Grand Ceremony",
+    desc: "A monumental 16-kali Jaipur bridal lehenga layered with real gold zardozi, matched with an archival Jadau Navratna necklace and tissue veil.",
+    modelImg: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=900&q=80",
+    totalVal: 18699,
+    pieces: [
+      {
+        name: "Crimson Gold Zardozi Bridal Lehenga",
+        type: "Couture Garment",
+        price: 12999,
+        img: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=160&q=80"
+      },
+      {
+        name: "Heritage Jadau Navratna Haar & Mathapatti",
+        type: "Heirloom Jewellery",
+        price: 4500,
+        img: "https://images.unsplash.com/photo-1611591475152-47e2a149023f?auto=format&fit=crop&w=160&q=80"
+      },
+      {
+        name: "Hand-Woven Gold Tissue Zari Dupatta",
+        type: "Atelier Accessory",
+        price: 1200,
+        img: "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=160&q=80"
+      }
+    ]
+  }
+];
+
+function RoyalEnsembleLookbook({ onOpenPiece, onNegotiateLook }) {
+  const [activeLook, setActiveLook] = useState(ROYAL_LOOKBOOK_PRESETS[0].id);
+  const current = ROYAL_LOOKBOOK_PRESETS.find(l => l.id === activeLook) || ROYAL_LOOKBOOK_PRESETS[0];
+
+  return (
+    <section className="lookbook-section" id="lookbook">
+      <div className="wrap">
+        <Reveal className="section-head">
+          <div>
+            <span className="tag" style={{ color: "var(--brass-bright)" }}>Curated Royal Ensembles</span>
+            <h2>Shop the Complete Look —<br />harmonised by master atelier stylists.</h2>
+          </div>
+          <p>Explore complete head-to-toe couture compositions pairing pure handloom garments with authentic heirloom jewellery and handcrafted accessories.</p>
+        </Reveal>
+
+        <div className="lookbook-tabs-nav">
+          {ROYAL_LOOKBOOK_PRESETS.map((look) => (
+            <button
+              key={look.id}
+              className={`lookbook-tab-pill ${activeLook === look.id ? 'active' : ''}`}
+              onClick={() => setActiveLook(look.id)}
+            >
+              {look.title}
+            </button>
+          ))}
+        </div>
+
+        <div className="lookbook-stage-grid">
+          
+          {/* Visual Model Frame */}
+          <div className="lookbook-visual-frame">
+            <img src={current.modelImg} alt={current.title} />
+            <div className="look-tag-pill">{current.tag}</div>
+          </div>
+
+          {/* Piece Breakdown List */}
+          <div className="lookbook-details-col">
+            <div className="lookbook-header-box">
+              <h3>{current.title}</h3>
+              <p>{current.desc}</p>
+            </div>
+
+            <div className="lookbook-pieces-list">
+              {current.pieces.map((p, i) => (
+                <div key={i} className="lookbook-piece-item">
+                  <div className="piece-item-info">
+                    <img src={p.img} alt={p.name} className="piece-item-thumb" />
+                    <div className="piece-item-text">
+                      <h5>{p.name}</h5>
+                      <span>{p.type}</span>
+                    </div>
+                  </div>
+                  <div className="piece-item-price">${p.price.toLocaleString()}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="lookbook-total-bar">
+              <div>
+                <div className="lookbook-total-label">Complete Ensemble Value</div>
+                <div className="lookbook-total-val">${current.totalVal.toLocaleString()}</div>
+              </div>
+              <div style={{ display: "flex", gap: "10px" }}>
+                <button 
+                  className="btn-primary" 
+                  style={{ padding: "12px 24px", fontSize: "12px" }}
+                  onClick={() => onNegotiateLook && onNegotiateLook({
+                    name: `${current.title} Full Ensemble`,
+                    price: current.totalVal,
+                    img: current.modelImg,
+                    category: "Ensemble"
+                  })}
+                >
+                  <Bot size={14} /> Negotiate Ensemble
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================
+   HERITAGE GUARANTEE & PROVENANCE STATS CARDS
+   ========================================================= */
+function HeritageGuaranteeStats() {
+  const STATS = [
+    {
+      num: "100%",
+      accent: " Certified",
+      title: "Pure Handloom & Silk Mark",
+      desc: "Every thread authenticated under lab testing — zero powerloom duplicates.",
+      icon: <Award size={20} />
+    },
+    {
+      num: "180+",
+      accent: " Hours",
+      title: "Artisan Loom Time",
+      desc: "Woven by generational master artisans with direct ethical patronage.",
+      icon: <Clock size={20} />
+    },
+    {
+      num: "3-Tier",
+      accent: " Seal",
+      title: "Cryptographic Provenance",
+      desc: "Physical NFC card + digital certificate issued with individual serial code.",
+      icon: <ShieldCheck size={20} />
+    },
+    {
+      num: "Global",
+      accent: " VIP",
+      title: "Insured White-Glove Delivery",
+      desc: "Tamper-evident sealed vault box with full transit insurance worldwide.",
+      icon: <Sparkles size={20} />
+    }
+  ];
+
+  return (
+    <section className="heritage-stats-section">
+      <div className="wrap">
+        <div className="heritage-stats-grid">
+          {STATS.map((s, i) => (
+            <div key={i} className="heritage-stat-card">
+              <div className="stat-card-icon">{s.icon}</div>
+              <div className="stat-card-num">
+                {s.num}<em>{s.accent}</em>
+              </div>
+              <h4 className="stat-card-title">{s.title}</h4>
+              <p className="stat-card-desc">{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================
    LUXURY FILTER DECK & INTERACTIVE COLLECTION CONSOLE
    ========================================================= */
 function LuxuryFilterDeck({ 
@@ -1209,6 +1882,9 @@ export default function VixaraSite() {
         <div className="nav-links">
           <nav><ul>
             <li><Link to="/collection">Collection</Link></li>
+            <li><a href="#occasions" onClick={(e) => scrollToSection('#occasions', e)}>Occasions</a></li>
+            <li><a href="#anatomy" onClick={(e) => scrollToSection('#anatomy', e)}>Weaves</a></li>
+            <li><a href="#lookbook" onClick={(e) => scrollToSection('#lookbook', e)}>Lookbook</a></li>
             <li><a href="#manifesto" onClick={(e) => scrollToSection('#manifesto', e)}>Provenance</a></li>
             <li><a href="#membership" onClick={(e) => scrollToSection('#membership', e)}>Access</a></li>
           </ul></nav>
@@ -1227,8 +1903,11 @@ export default function VixaraSite() {
 
       {menuOpen && (
         <div style={{position:"fixed",inset:0,zIndex:200,background:"var(--ink)",display:"flex",flexDirection:"column",padding:"90px 28px 28px"}}>
-          <nav style={{display:"flex",flexDirection:"column",gap:28,fontSize:20,fontFamily:"'Fraunces',serif"}}>
+          <nav style={{display:"flex",flexDirection:"column",gap:24,fontSize:18,fontFamily:"'Fraunces',serif"}}>
             <Link to="/collection" onClick={() => setMenuOpen(false)}>Collection</Link>
+            <a href="#occasions" onClick={(e) => scrollToSection('#occasions', e)}>Occasions</a>
+            <a href="#anatomy" onClick={(e) => scrollToSection('#anatomy', e)}>Weaves Studio</a>
+            <a href="#lookbook" onClick={(e) => scrollToSection('#lookbook', e)}>Lookbook</a>
             <a href="#manifesto" onClick={(e) => scrollToSection('#manifesto', e)}>Provenance</a>
             <a href="#membership" onClick={(e) => scrollToSection('#membership', e)}>Access</a>
           </nav>
@@ -1242,12 +1921,38 @@ export default function VixaraSite() {
         onNegotiate={setNegotiateProduct}
       />
 
+      {/* Live Atelier Activity & Concierge Pulse Bar */}
+      <LiveAtelierPulseBar 
+        onExplorePiece={(sku) => {
+          const found = products.find(p => (p.sku && p.sku.includes(sku)) || p.id === sku);
+          if (found) setSelectedProduct(found);
+          else scrollToSection('#collection');
+        }} 
+      />
+
       {/* Atelier Craftsmanship & Provenance Story Strip */}
       <CraftsmanshipStrip 
         onExploreClick={(e) => scrollToSection('#manifesto', e)}
       />
 
       <div className="seam-wrap"><div className="seam"></div></div>
+
+      {/* Occasion & Silhouette Stylist Concierge */}
+      <OccasionSilhouetteMatcher 
+        onOpen={setSelectedProduct}
+        onNegotiate={setNegotiateProduct}
+      />
+
+      {/* Fabric & Zari Sensory Studio (The Atelier Anatomy) */}
+      <AtelierFabricStudio 
+        onOpenCatalog={() => scrollToSection('#collection')}
+      />
+
+      {/* Curated Royal Ensembles & Shop The Look */}
+      <RoyalEnsembleLookbook 
+        onOpenPiece={setSelectedProduct}
+        onNegotiateLook={setNegotiateProduct}
+      />
 
       <div className="marquee-section">
         <div className="marquee-track">
@@ -1327,6 +2032,9 @@ export default function VixaraSite() {
           </Link>
         </div>
       </section>
+
+      {/* Heritage Guarantee & Provenance Stats Cards */}
+      <HeritageGuaranteeStats />
 
       <ProductModal product={selectedProduct} onClose={() => setSelectedProduct(null)} isFavorite={selectedProduct ? isFavorite(selectedProduct) : false} onToggleFavorite={toggleFavorite} />
       {negotiateProduct && (
