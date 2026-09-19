@@ -839,12 +839,12 @@ function GrandShowcaseHero({ products = [], onOpen, onNegotiate }) {
     setCurrentIndex(idx);
   }, [currentIndex]);
 
-  // Auto rotation
+  // Auto rotation: 2 seconds per picture
   useEffect(() => {
     if (isPaused) return;
     const timer = setInterval(() => {
       goNext();
-    }, 5500);
+    }, 2000);
     return () => clearInterval(timer);
   }, [isPaused, goNext]);
 
