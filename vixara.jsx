@@ -797,7 +797,6 @@ function FavoritesDrawer({ open, onClose, favorites, onToggleFavorite }) {
 function GrandShowcaseHero({ products = [], onOpen, onNegotiate }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState('next');
-  const [isPaused, setIsPaused] = useState(false);
 
   // Combine database products with rich showcase metadata
   const showcaseItems = HERO_SHOWCASE_PRESETS.map((preset) => {
@@ -839,20 +838,9 @@ function GrandShowcaseHero({ products = [], onOpen, onNegotiate }) {
     setCurrentIndex(idx);
   }, [currentIndex]);
 
-  // Auto rotation: 2 seconds per picture
-  useEffect(() => {
-    if (isPaused) return;
-    const timer = setInterval(() => {
-      goNext();
-    }, 2000);
-    return () => clearInterval(timer);
-  }, [isPaused, goNext]);
-
   return (
     <section 
       className={`grand-showcase ${current.hue || 'hue-sapphire'}`}
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
     >
       <div className="wrap" style={{ width: "100%" }}>
         
