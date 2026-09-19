@@ -365,7 +365,7 @@ export default function CollectionPage() {
               ))}
             </div>
 
-            <div style={{ position: "relative", width: 280 }}>
+            <div style={{ position: "relative", width: "100%", maxWidth: 320 }}>
               <Search size={16} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--bone-dim)" }} />
               <input
                 type="text"
@@ -373,7 +373,7 @@ export default function CollectionPage() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 className="custom-input"
-                style={{ paddingLeft: 40, padding: "10px 14px 10px 40px", fontSize: 13 }}
+                style={{ paddingLeft: 40, padding: "10px 14px 10px 40px", fontSize: 13, width: "100%" }}
               />
             </div>
           </div>

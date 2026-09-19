@@ -1349,4 +1349,257 @@
           70%{box-shadow:0 0 0 14px rgba(2, 132, 199, 0);}
           100%{box-shadow:0 0 0 0 rgba(2, 132, 199, 0);}
         }
+
+        /* =========================================================
+           COMPREHENSIVE MOBILE RESPONSIVENESS (< 860px and < 540px)
+           ========================================================= */
+        @media (max-width: 860px) {
+          .grand-showcase {
+            padding: 95px 0 20px;
+            min-height: auto;
+          }
+          .grand-stage-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            padding: 10px 0 24px;
+            text-align: center;
+          }
+          .hero-center-stage {
+            order: 1;
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto;
+          }
+          .hero-floating-visual-wrap {
+            max-width: 300px;
+            aspect-ratio: 1/1;
+          }
+          .hero-info-col {
+            order: 2;
+            width: 100%;
+            align-items: center;
+            text-align: center;
+            gap: 10px;
+          }
+          .hero-grand-title {
+            font-size: clamp(24px, 6.5vw, 36px);
+            line-height: 1.15;
+          }
+          .hero-meta-row {
+            justify-content: center;
+            gap: 12px;
+          }
+          .hero-price-tag {
+            font-size: 22px;
+          }
+          .hero-cta-group {
+            width: 100%;
+            justify-content: center;
+            gap: 10px;
+          }
+          .hero-cta-group .btn-pill-cyan,
+          .hero-cta-group .btn-pill-gold,
+          .hero-cta-group .btn-pill-ghost {
+            flex: 1 1 calc(50% - 10px);
+            min-width: 140px;
+            padding: 12px 16px;
+            font-size: 11px;
+            justify-content: center;
+          }
+          .hero-reel-card {
+            order: 3;
+            display: flex;
+            max-width: 100%;
+            width: 100%;
+            flex-direction: row;
+            align-items: center;
+            padding: 12px 14px;
+            gap: 12px;
+            margin: 0;
+            border-radius: 16px;
+          }
+          .hero-reel-thumb-wrap {
+            width: 70px;
+            height: 50px;
+            flex-shrink: 0;
+            aspect-ratio: auto;
+          }
+          .pulse-play-btn {
+            width: 28px;
+            height: 28px;
+          }
+          .pulse-play-btn svg {
+            width: 12px;
+            height: 12px;
+          }
+          .hero-reel-meta {
+            text-align: left;
+          }
+          .hero-reel-meta h5 {
+            font-size: 12px;
+            margin-bottom: 2px;
+          }
+          .hero-reel-meta p {
+            font-size: 10px;
+          }
+
+          /* Dial Navigator on Mobile */
+          .hero-dial-navigator {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0 6px;
+            margin-top: 10px;
+            gap: 6px;
+          }
+          .hero-nav-ticker {
+            padding: 6px 10px;
+            font-size: 10px;
+            max-width: 90px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          .dial-track-container {
+            gap: 6px;
+          }
+          .dial-gauge {
+            gap: 4px;
+          }
+          .dial-dot {
+            font-size: 10px;
+            padding: 2px 5px;
+          }
+          .dial-tick {
+            display: none;
+          }
+
+          /* Craft Strip */
+          .craft-strip-section {
+            padding: 20px 0 36px;
+          }
+          .craft-strip-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+          }
+          .craft-story-card {
+            padding: 12px 16px;
+            gap: 14px;
+            border-radius: 18px;
+          }
+          .craft-story-img-box {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+          }
+
+          /* Filter Deck Mobile */
+          .luxury-filter-deck {
+            padding: 16px 14px;
+            border-radius: 18px;
+            margin-bottom: 24px;
+            gap: 16px;
+          }
+          .filter-deck-row {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+          }
+          .filter-deck-group {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+            width: 100%;
+          }
+          .filter-pills-bar {
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            width: 100%;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+          }
+          .filter-pills-bar::-webkit-scrollbar {
+            display: none;
+          }
+          .deck-pill {
+            white-space: nowrap;
+            flex-shrink: 0;
+            padding: 6px 14px;
+            font-size: 11px;
+          }
+          .size-dial-group {
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            width: 100%;
+            gap: 6px;
+          }
+          .size-dial-btn {
+            width: 32px;
+            height: 32px;
+            font-size: 10px;
+            flex-shrink: 0;
+          }
+          .color-swatch-group {
+            gap: 10px;
+            flex-wrap: wrap;
+          }
+
+          /* Card Grid */
+          .luxury-card-grid {
+            grid-template-columns: 1fr;
+            gap: 18px;
+          }
+
+          /* Modals on Mobile */
+          .modal-card-custom,
+          .modal-card {
+            width: 94% !important;
+            max-height: 88vh !important;
+            padding: 22px 16px !important;
+            border-radius: 20px !important;
+            margin: auto;
+          }
+          .ai-negotiate-card {
+            width: 94% !important;
+            max-height: 88vh !important;
+            padding: 20px 16px !important;
+          }
+          .tryon-controls {
+            flex-direction: column;
+            gap: 8px;
+          }
+          .tryon-actions {
+            flex-direction: column;
+            width: 100%;
+            gap: 8px;
+          }
+          .tryon-stage {
+            height: 260px !important;
+          }
+          .favorites-drawer {
+            width: 100% !important;
+            max-width: 100% !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .hero-cta-group .btn-pill-cyan,
+          .hero-cta-group .btn-pill-gold,
+          .hero-cta-group .btn-pill-ghost {
+            flex: 1 1 100%;
+            width: 100%;
+          }
+          .hero-nav-ticker span {
+            display: none;
+          }
+          .hero-nav-ticker {
+            padding: 6px 8px;
+            max-width: auto;
+          }
+          .dial-track-container {
+            gap: 4px;
+          }
+        }
       
