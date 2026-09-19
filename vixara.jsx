@@ -796,6 +796,7 @@ function FavoritesDrawer({ open, onClose, favorites, onToggleFavorite }) {
    ========================================================= */
 function GrandShowcaseHero({ products = [], onOpen, onNegotiate }) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState('next');
   const [isPaused, setIsPaused] = useState(false);
 
   // Combine database products with rich showcase metadata
@@ -824,12 +825,19 @@ function GrandShowcaseHero({ products = [], onOpen, onNegotiate }) {
   const nextItem = showcaseItems[(currentIndex + 1) % total];
 
   const goNext = useCallback(() => {
+    setDirection('next');
     setCurrentIndex(i => (i + 1) % total);
   }, [total]);
 
   const goPrev = useCallback(() => {
+    setDirection('prev');
     setCurrentIndex(i => (i - 1 + total) % total);
   }, [total]);
+
+  const goToIndex = useCallback((idx) => {
+    setDirection(idx >= currentIndex ? 'next' : 'prev');
+    setCurrentIndex(idx);
+  }, [currentIndex]);
 
   // Auto rotation
   useEffect(() => {
@@ -857,10 +865,16 @@ function GrandShowcaseHero({ products = [], onOpen, onNegotiate }) {
               <ShieldCheck size={14} style={{ color: "var(--brass-bright)" }} />
               {current.sku || `VX-${current.id}`}
             </div>
-            <h1 className="hero-grand-title" key={`title-${current.id}-${currentIndex}`}>
+            <h1 
+              className={`hero-grand-title ${direction === 'next' ? 'slide-in-right' : 'slide-in-left'}`} 
+              key={`title-${current.id}-${currentIndex}`}
+            >
               {current.name}
             </h1>
-            <div className="hero-meta-row" key={`meta-${current.id}-${currentIndex}`}>
+            <div 
+              className={`hero-meta-row ${direction === 'next' ? 'slide-in-right' : 'slide-in-left'}`} 
+              key={`meta-${current.id}-${currentIndex}`}
+            >
               <span className="hero-price-tag">${current.price.toLocaleString()}</span>
               <span className="hero-availability-tag">
                 <CheckCircle2 size={13} /> {current.status || 'AVAILABLE'}
@@ -883,7 +897,7 @@ function GrandShowcaseHero({ products = [], onOpen, onNegotiate }) {
             </div>
           </div>
 
-          {/* Center Column: 3D Floating Garment Visual with Seamless Cross-Fade */}
+          {/* Center Column: Grounded Garment Stage with Smooth Horizontal Right/Left Slide */}
           <div 
             className="hero-center-stage" 
             onClick={() => onOpen(current)}
@@ -894,14 +908,21 @@ function GrandShowcaseHero({ products = [], onOpen, onNegotiate }) {
                 className="hero-floating-glow" 
                 style={{ background: current.glowColor || 'rgba(14, 116, 144, 0.4)' }}
               />
-              {showcaseItems.map((item, idx) => (
-                <img 
-                  key={item.id}
-                  src={item.img} 
-                  alt={item.name} 
-                  className={`hero-floating-img ${idx === currentIndex ? 'active-slide' : 'inactive-slide'}`} 
-                />
-              ))}
+              {showcaseItems.map((item, idx) => {
+                let slideClass = "active-slide";
+                if (idx !== currentIndex) {
+                  const diff = (idx - currentIndex + total) % total;
+                  slideClass = (diff === 1 || (diff > 1 && direction === 'next')) ? 'slide-right' : 'slide-left';
+                }
+                return (
+                  <img 
+                    key={item.id}
+                    src={item.img} 
+                    alt={item.name} 
+                    className={`hero-floating-img ${slideClass}`} 
+                  />
+                );
+              })}
               <div className="hero-inspect-hint">
                 <Sparkles size={12} /> Click to Inspect &amp; Try-On
               </div>
@@ -943,7 +964,7 @@ function GrandShowcaseHero({ products = [], onOpen, onNegotiate }) {
                 <div 
                   key={idx} 
                   className={`dial-step-node ${idx === currentIndex ? 'active' : ''}`}
-                  onClick={() => setCurrentIndex(idx)}
+                  onClick={() => goToIndex(idx)}
                 >
                   <span className="dial-tick" />
                   <span className="dial-dot">0{idx + 1}</span>

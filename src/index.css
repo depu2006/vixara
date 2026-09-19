@@ -718,12 +718,21 @@
           color:var(--bone);
           margin:0;
           text-shadow:0 10px 30px rgba(0,0,0,0.6);
-          animation:heroTextSlide 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        @keyframes heroTextSlide{
-          from{opacity:0;transform:translateY(10px);}
-          to{opacity:1;transform:translateY(0);}
+        .slide-in-right{
+          animation:slideFromRight 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .slide-in-left{
+          animation:slideFromLeft 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes slideFromRight{
+          from{opacity:0;transform:translateX(35px);}
+          to{opacity:1;transform:translateX(0);}
+        }
+        @keyframes slideFromLeft{
+          from{opacity:0;transform:translateX(-35px);}
+          to{opacity:1;transform:translateX(0);}
         }
 
         .hero-meta-row{
@@ -732,7 +741,6 @@
           gap:16px;
           margin-top:6px;
           flex-wrap:wrap;
-          animation:heroTextSlide 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
         @media(max-width:860px){
           .hero-meta-row{justify-content:center;}
@@ -829,7 +837,7 @@
           transform:translateY(-2px);
         }
 
-        /* Center Floating Piece with Seamless Cross-Fade */
+        /* Center Stage with Smooth Horizontal Right/Left Slide (No Vertical Bobbing) */
         .hero-center-stage{
           display:flex;
           align-items:center;
@@ -840,21 +848,21 @@
         .hero-floating-visual-wrap{
           position:relative;
           width:100%;
-          max-width:440px;
+          max-width:460px;
           aspect-ratio:1/1;
           display:flex;
           align-items:center;
           justify-content:center;
-          animation:heroFloat 7s ease-in-out infinite alternate;
+          overflow:hidden;
         }
         .hero-floating-glow{
           position:absolute;
-          inset:10%;
+          inset:8%;
           border-radius:50%;
-          filter:blur(60px);
+          filter:blur(65px);
           opacity:0.65;
           z-index:1;
-          transition:background 1s cubic-bezier(0.16, 1, 0.3, 1);
+          transition:background 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .hero-floating-img{
           position:absolute;
@@ -863,23 +871,30 @@
           width:85%;
           height:85%;
           object-fit:contain;
-          filter:drop-shadow(0 25px 40px rgba(0,0,0,0.85));
-          transition:opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), filter 0.7s ease;
+          filter:drop-shadow(0 22px 40px rgba(0,0,0,0.85));
+          transition:transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+          pointer-events:none;
         }
         .hero-floating-img.active-slide{
           opacity:1;
-          transform:scale(1) rotate(0deg);
+          transform:translateX(0) scale(1);
           z-index:2;
           pointer-events:auto;
         }
-        .hero-floating-img.inactive-slide{
+        .hero-floating-img.slide-left{
           opacity:0;
-          transform:scale(0.9) translateY(18px);
+          transform:translateX(-90px) scale(0.92);
+          z-index:1;
+          pointer-events:none;
+        }
+        .hero-floating-img.slide-right{
+          opacity:0;
+          transform:translateX(90px) scale(0.92);
           z-index:1;
           pointer-events:none;
         }
         .hero-center-stage:hover .hero-floating-img.active-slide{
-          transform:scale(1.06) rotate(1.2deg);
+          transform:translateX(0) scale(1.05);
         }
         .hero-inspect-hint{
           position:absolute;
